@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Editor</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/show-hint.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldgutter.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/lint/lint.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6ee0;
+            --secondary-color: #6c757d;
+            --dark-color: #2d3748;
+            --light-color: #f8f9fa;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .mobile-tabs {
+            display: none;
+            background: #252525;
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .mobile-tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .mobile-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .mobile-tab.has-error::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--error-color);
+        }
+
+        .editor-preview-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .code-section, .preview-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            min-height: 400px;
+        }
+
+        .preview-section {
+            background: white;
+            border-left: 1px solid #333;
+        }
+
+        .section-header {
+            background: #252525;
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            min-height: 50px;
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .error-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--error-color);
+        }
+
+        .error-indicator.hidden {
+            display: none;
+        }
+
+        .tab-container {
+            display: flex;
+            background: #252525;
+            overflow-x: auto;
+            border-bottom: 1px solid #333;
+            scrollbar-width: thin;
+            scrollbar-color: #444 #252525;
+        }
+
+        .tab-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .tab-container::-webkit-scrollbar-track {
+            background: #252525;
+        }
+
+        .tab-container::-webkit-scrollbar-thumb {
+            background-color: #444;
+            border-radius: 3px;
+        }
+
+        .tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-size: 0.95rem;
+            position: relative;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            background: #1e1e1e;
+            font-weight: 600;
+        }
+
+        .tab.has-error::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--error-color);
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* Cập nhật CSS để CodeMirror luôn mở rộng full chiều ngang */
+        .CodeMirror {
+            height: 100%;
+            font-size: 14px;
+            line-height: 1.5;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .CodeMirror-scroll {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .CodeMirror-lines {
+            width: 100% !important;
+        }
+
+        .CodeMirror-line {
+            width: 100% !important;
+        }
+
+        .CodeMirror-lint-mark-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-bottom: 2px dotted var(--error-color);
+        }
+
+        .CodeMirror-lint-tooltip {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: var(--border-radius);
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            max-width: 300px;
+            padding: 8px 12px;
+            z-index: 1000;
+        }
+
+        .preview-container {
+            flex: 1;
+            padding: 0;
+            border: none;
+            overflow: auto;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .iframe-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.2rem;
+            z-index: 10;
+            display: none;
+        }
+
+        .iframe-overlay.active {
+            display: flex;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            background: #252525;
+            border-top: 1px solid #333;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .run-btn {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .run-btn:hover {
+            background: #3a5ecf;
+            transform: translateY(-2px);
+        }
+
+        .clear-btn {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .reset-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .export-btn {
+            background: var(--success-color);
+            color: white;
+        }
+
+        .export-btn:hover {
+            background: #0da271;
+            transform: translateY(-2px);
+        }
+
+        .error-panel {
+            background: #2d1a1a;
+            border-top: 1px solid #5c2c2c;
+            color: #f8a5a5;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            max-height: 120px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .error-panel.active {
+            display: block;
+        }
+
+        .error-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .error-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .error-icon {
+            color: var(--error-color);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .error-message {
+            flex: 1;
+        }
+
+        /* CSS cho tab Export */
+        .export-content {
+            padding: 20px;
+            background: #1e1e1e;
+            color: #e0e0e0;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .export-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #252525;
+            border-radius: var(--border-radius);
+            border: 1px solid #333;
+        }
+
+        .export-section h3 {
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .export-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .export-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .export-option label {
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .export-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .export-input-group label {
+            font-weight: 500;
+            color: #ccc;
+        }
+
+        .export-input-group input {
+            padding: 8px 12px;
+            border: 1px solid #444;
+            border-radius: var(--border-radius);
+            background: #1e1e1e;
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        .export-input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .export-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .export-action-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .export-note {
+            margin-top: 15px;
+            padding: 10px;
+            background: #2d3748;
+            border-radius: var(--border-radius);
+            font-size: 0.85rem;
+            color: #a0aec0;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .mobile-tabs {
+                display: flex;
+            }
+            
+            .preview-section {
+                border-left: none;
+            }
+            
+            .code-section, .preview-section {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+            }
+            
+            .preview-section {
+                transform: translateX(100%);
+            }
+            
+            .code-section.active, .preview-section.active {
+                transform: translateX(0);
+                z-index: 2;
+            }
+            
+            .button-container {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                z-index: 100;
+                padding: 12px;
+                gap: 10px;
+            }
+            
+            button {
+                flex: 1;
+                padding: 12px 16px;
+                font-size: 0.9rem;
+                justify-content: center;
+            }
+            
+            .tab {
+                padding: 10px 14px;
+                font-size: 0.9rem;
+                min-width: 70px;
+            }
+            
+            .section-header {
+                padding: 10px 16px;
+                min-height: 46px;
+            }
+            
+            .section-title {
+                font-size: 1rem;
+            }
+            
+            .error-panel {
+                max-height: 100px;
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .export-content {
+                padding: 15px;
+            }
+            
+            .export-section {
+                padding: 12px;
+            }
+            
+            .export-actions {
+                flex-direction: column;
+            }
+            
+            .export-action-btn {
+                min-width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tab-container {
+                padding: 0 8px;
+            }
+            
+            .tab {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+                min-width: 60px;
+            }
+            
+            .button-container {
+                padding: 10px;
+            }
+            
+            button {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+            
+            .mobile-tab {
+                padding: 12px 10px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .tab {
+                padding: 8px 10px;
+                font-size: 0.8rem;
+                min-width: 55px;
+            }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="mobile-tabs">
+            <div class="mobile-tab active" data-tab="code">Code</div>
+            <div class="mobile-tab" data-tab="preview">Kết Quả</div>
+        </div>
+        
+        <div class="editor-preview-container">
+            <div class="code-section active">
+                <div class="section-header">
+                    <div class="section-title">Mã Nguồn</div>
+                    <div class="error-indicator hidden" id="error-indicator">
+                        <span>⚠</span> <span id="error-count">0 lỗi</span>
+                    </div>
+                </div>
+                <div class="tab-container">
+                    <div class="tab active" data-tab="html">HTML</div>
+                    <div class="tab" data-tab="css">CSS</div>
+                    <div class="tab" data-tab="js">JavaScript</div>
+                    <div class="tab" data-tab="export">Xuất File</div>
+                </div>
+                <div class="tab-content active" id="html-content">
+                    <textarea id="html-code"><!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang web của tôi</title>
+</head>
+<body>
+    <h1>Xin chào!</h1>
+    <p>Đây là trang web được tạo bằng trình soạn thảo HTML.</p>
+</body>
+</html></textarea>
+                </div>
+                <div class="tab-content" id="css-content">
+                    <textarea id="css-code">/* 
+ * TRÌNH SOẠN THẢO CSS
+ * 
+ * Nhập mã CSS của bạn vào đây. CSS sẽ được áp dụng trực tiếp vào trang HTML.
+ * 
+ * Ví dụ:
+ * - Để thay đổi màu nền: body { background-color: #f0f0f0; }
+ * - Để thay đổi font chữ: body { font-family: Arial, sans-serif; }
+ * - Để tạo hiệu ứng hover: button:hover { background-color: #4a6ee0; }
+ * 
+ * CSS được viết theo cú pháp: selector { property: value; }
+ */
+
+/* Bắt đầu viết CSS của bạn từ đây */</textarea>
+                </div>
+                <div class="tab-content" id="js-content">
+                    <textarea id="js-code">/* 
+ * TRÌNH SOẠN THẢO JAVASCRIPT
+ * 
+ * Nhập mã JavaScript của bạn vào đây. JS sẽ được thực thi trên trang HTML.
+ * 
+ * Ví dụ:
+ * - Hiển thị thông báo: alert('Xin chào!');
+ * - Thay đổi nội dung: document.getElementById('id').innerHTML = 'Nội dung mới';
+ * - Xử lý sự kiện: element.addEventListener('click', function() { ... });
+ * 
+ * Mẹo: Sử dụng console.log() để in ra kết quả kiểm tra
+ */
+
+// Bắt đầu viết JavaScript của bạn từ đây</textarea>
+                </div>
+                <div class="tab-content" id="export-content">
+                    <div class="export-content">
+                        <div class="export-section">
+                            <h3>Tuỳ chọn xuất file</h3>
+                            <div class="export-options">
+                                <div class="export-option">
+                                    <input type="checkbox" id="export-html-check" checked>
+                                    <label for="export-html-check">Xuất file HTML</label>
+                                </div>
+                                <div class="export-option">
+                                    <input type="checkbox" id="export-css-check" checked>
+                                    <label for="export-css-check">Xuất file CSS</label>
+                                </div>
+                                <div class="export-option">
+                                    <input type="checkbox" id="export-js-check" checked>
+                                    <label for="export-js-check">Xuất file JavaScript</label>
+                                </div>
+                                <div class="export-option">
+                                    <input type="checkbox" id="export-all-check">
+                                    <label for="export-all-check">Xuất tất cả file trong một thư mục ZIP</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="export-section">
+                            <h3>Tuỳ chỉnh tên file</h3>
+                            <div class="export-input-group">
+                                <label for="html-filename">Tên file HTML:</label>
+                                <input type="text" id="html-filename" value="index.html" placeholder="index.html">
+                            </div>
+                            <div class="export-input-group">
+                                <label for="css-filename">Tên file CSS:</label>
+                                <input type="text" id="css-filename" value="style.css" placeholder="style.css">
+                            </div>
+                            <div class="export-input-group">
+                                <label for="js-filename">Tên file JavaScript:</label>
+                                <input type="text" id="js-filename" value="script.js" placeholder="script.js">
+                            </div>
+                            <div class="export-input-group">
+                                <label for="zip-filename">Tên file ZIP (nếu có):</label>
+                                <input type="text" id="zip-filename" value="my-website.zip" placeholder="my-website.zip">
+                            </div>
+                        </div>
+                        
+                        <div class="export-section">
+            
