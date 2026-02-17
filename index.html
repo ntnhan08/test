@@ -927,8 +927,41 @@
         const errorCount = document.getElementById('error-count');
         const errorPanel = document.getElementById('error-panel');
 
-        // Hàm kiểm tra lỗi
-        function checkForErrors() {
+        // --- Hàm kiểm tra lỗi NHANH (chỉ dùng lint, không validate HTML) ---
+        function quickCheckForErrors() {
+            let totalErrors = 0;
+            const allErrors = [];
+            
+            // Lỗi CSS và JS được phát hiện bởi CodeMirror lint
+            const cssState = cssEditor.state.lint.marked;
+            const jsState = jsEditor.state.lint.marked;
+            
+            if (cssState && cssState.length > 0) {
+                totalErrors += cssState.length;
+                allErrors.push(...cssState.map(m => ({
+                    message: m.message,
+                    type: 'CSS',
+                    line: m.from.line + 1
+                })));
+            }
+            
+            if (jsState && jsState.length > 0) {
+                totalErrors += jsState.length;
+                allErrors.push(...jsState.map(m => ({
+                    message: m.message,
+                    type: 'JavaScript',
+                    line: m.from.line + 1
+                })));
+            }
+            
+            // Cập nhật giao diện hiển thị lỗi
+            updateErrorDisplay(totalErrors, allErrors);
+            
+            return totalErrors;
+        }
+
+        // --- Hàm kiểm tra lỗi ĐẦY ĐỦ (có validate HTML) - dùng khi nhấn nút Run ---
+        function fullCheckForErrors() {
             let totalErrors = 0;
             const allErrors = [];
             
@@ -938,7 +971,7 @@
             totalErrors += htmlErrors.length;
             allErrors.push(...htmlErrors.map(e => ({...e, type: 'HTML'})));
             
-            // Lỗi CSS và JS được phát hiện bởi CodeMirror lint
+            // Lỗi CSS và JS từ lint
             const cssState = cssEditor.state.lint.marked;
             const jsState = jsEditor.state.lint.marked;
             
@@ -1081,8 +1114,8 @@
             // Hiển thị overlay tải
             iframeOverlay.classList.add('active');
             
-            // Kiểm tra lỗi trước khi chạy
-            const errorCount = checkForErrors();
+            // Kiểm tra lỗi ĐẦY ĐỦ
+            const errorCount = fullCheckForErrors();
             
             const html = htmlEditor.getValue();
             const css = cssEditor.getValue();
@@ -1171,14 +1204,41 @@
             }
         }
 
-        // --- TỰ ĐỘNG CHẠY MÃ KHI NHẬP XONG ---
+        // --- TỰ ĐỘNG CHẠY MÃ KHI NHẬP XONG (NHANH & NHẸ) ---
         let autoRunTimeout;
         [htmlEditor, cssEditor, jsEditor].forEach(editor => {
             editor.on('change', () => {
                 clearTimeout(autoRunTimeout);
                 autoRunTimeout = setTimeout(() => {
-                    runCode();  // tự động chạy code sau 1.5 giây dừng gõ
-                }, 1500);
+                    // Chỉ kiểm tra lỗi nhanh (bỏ qua validate HTML)
+                    quickCheckForErrors();
+                    // Chạy lại iframe
+                    iframeOverlay.classList.add('active');
+                    const html = htmlEditor.getValue();
+                    const css = cssEditor.getValue();
+                    const js = jsEditor.getValue();
+                    const previewDocument = previewFrame.contentDocument || previewFrame.contentWindow.document;
+                    const fullHtml = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <style>${css}</style>
+                        </head>
+                        <body>
+                            ${html}
+                            <script>${js}<\/script>
+                        </body>
+                        </html>
+                    `;
+                    previewDocument.open();
+                    previewDocument.write(fullHtml);
+                    previewDocument.close();
+                    setTimeout(() => {
+                        iframeOverlay.classList.remove('active');
+                    }, 500);
+                }, 800); // giảm xuống 800ms cho cảm giác nhanh hơn
             });
         });
 
