@@ -3,543 +3,1184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thiệp Tết - Mở phong bì xe</title>
-    <!-- Font Awesome cho icon xe, phong bì -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- Thư viện nén dữ liệu cho phép đính kèm ảnh base64 vào URL -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+    <title>HTML Editor Pro</title>
+    <link rel="icon" href="logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/show-hint.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldgutter.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/lint/lint.min.css">
     <style>
+        :root {
+            --primary-color: #4a6ee0;
+            --secondary-color: #6c757d;
+            --dark-color: #2d3748;
+            --light-color: #f8f9fa;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --warning-color: #f59e0b;
+            --border-radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         body {
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(145deg, #990000 0%, #cc3300 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-            margin: 0;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+            overflow-x: hidden;
+            height: 100vh;
         }
+
         .container {
-            max-width: 700px;
-            width: 100%;
-            background: #fff9e6;
-            border: 6px solid #ffcc00;
-            border-radius: 40px 40px 20px 20px;
-            box-shadow: 0 20px 30px rgba(0,0,0,0.5), inset 0 0 20px #ffeb99;
-            overflow: hidden;
-            position: relative;
-        }
-        /* Phần trang trí Tết */
-        .header {
-            background: #ffd966;
-            padding: 20px 10px 10px;
-            text-align: center;
-            clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%);
-        }
-        .header h1 {
-            font-size: 2.2rem;
-            color: #b30000;
-            text-shadow: 3px 3px 0 #ffff99;
-            letter-spacing: 4px;
-            margin: 0;
-            font-weight: 900;
-        }
-        .header p {
-            font-size: 1rem;
-            color: #660000;
-            font-style: italic;
-        }
-        .main-content {
-            padding: 30px 25px 40px;
-        }
-        /* FORM tạo thiệp */
-        .create-form {
-            background: #ffeedd;
-            border-radius: 30px;
-            padding: 25px;
-            border: 2px dashed #ffaa00;
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            font-weight: 700;
-            color: #a30000;
-            margin-bottom: 8px;
-            font-size: 1.2rem;
-        }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #ff9933;
-            border-radius: 50px;
-            font-size: 1rem;
-            outline: none;
-            transition: 0.2s;
-            background: #fffff0;
-        }
-        .form-group textarea {
-            border-radius: 25px;
-            resize: vertical;
-        }
-        .form-group input:focus, .form-group textarea:focus {
-            border-color: #cc0000;
-            box-shadow: 0 0 0 4px #ffcccc;
-        }
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-        .file-input-wrapper input[type=file] {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-        .custom-file-btn {
-            background: #ffbb33;
-            border: 2px solid #b34700;
-            color: #4d1f00;
-            padding: 12px 20px;
-            border-radius: 50px;
-            text-align: center;
-            font-weight: bold;
-            display: inline-block;
-            width: 100%;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .custom-file-btn:hover {
-            background: #ffaa00;
-        }
-        #file-name {
-            margin-top: 8px;
-            font-size: 0.9rem;
-            color: #704214;
-        }
-        .btn-primary {
-            background: #cc3300;
-            color: #ffecb3;
-            border: none;
-            padding: 18px 25px;
-            border-radius: 60px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            width: 100%;
-            cursor: pointer;
-            box-shadow: 0 8px 0 #661100;
-            transition: 0.1s ease;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-        .btn-primary:active {
-            transform: translateY(5px);
-            box-shadow: 0 3px 0 #661100;
-        }
-        .link-result {
-            margin-top: 25px;
-            background: #ffffcc;
-            padding: 15px;
-            border-radius: 40px;
-            border: 2px solid #ffaa33;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-        .link-result input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #cc7a00;
-            border-radius: 50px;
-            background: white;
-            font-size: 0.9rem;
-        }
-        .btn-copy {
-            background: #2e7d32;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 40px;
-            font-weight: bold;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-        /* THIỆP chúc (xe mở) */
-        .card-envelope {
-            background: #ffeedd;
-            border-radius: 50px 50px 30px 30px;
-            padding: 20px 15px;
-            border: 3px solid #ffaa33;
-            box-shadow: inset 0 0 0 5px #fff2cc;
-        }
-        .vehicle-area {
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            height: 100vh;
+        }
+
+        .mobile-tabs {
+            display: none;
+            background: #252525;
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .mobile-tab {
+            flex: 1;
+            text-align: center;
+            padding: 14px;
             cursor: pointer;
-            transition: 0.3s;
-            background: #ffd9b3;
-            border-radius: 100px 100px 30px 30px;
-            padding: 30px 20px 20px;
-            border-bottom: 8px solid #b36b00;
-        }
-        .vehicle-icon {
-            font-size: 7rem;
-            color: #b34700;
-            filter: drop-shadow(8px 8px 0 #ffb347);
-            transition: 0.2s;
-        }
-        .vehicle-icon i {
-            transform: rotate(0deg);
-        }
-        .vehicle-area p {
-            font-size: 1.3rem;
-            font-weight: 700;
-            background: #ffcc66;
-            padding: 8px 20px;
-            border-radius: 40px;
-            color: #663300;
-            margin-top: 10px;
-            border: 2px solid #cc7a00;
-        }
-        .message-paper {
-            background: #fff3d6;
-            border-radius: 30px 30px 15px 15px;
-            padding: 25px;
-            border: 4px solid #cc7a00;
-            box-shadow: 0 10px 0 #995c00;
-            transform: translateY(20px);
-            transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-            margin-top: 10px;
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 1rem;
             position: relative;
         }
-        .message-paper.hidden {
-            opacity: 0;
-            transform: translateY(-30px) scale(0.9);
-            pointer-events: none;
+
+        .mobile-tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .mobile-tab.has-error::after {
+            content: '';
             position: absolute;
-        }
-        .avatar {
-            width: 120px;
-            height: 120px;
+            top: 8px;
+            right: 8px;
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            object-fit: cover;
-            border: 5px solid #ffaa00;
-            margin: 0 auto 15px;
-            display: block;
-            background: #ccc;
+            background-color: var(--error-color);
         }
-        .paper-content {
-            text-align: center;
-        }
-        .paper-content h2 {
-            color: #b34100;
-            font-size: 2rem;
-            border-bottom: 3px dashed #ffaa33;
-            padding-bottom: 10px;
-        }
-        .paper-content .name-tag {
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: #cc3300;
-        }
-        .paper-content .greeting {
-            font-size: 1.3rem;
-            background: #ffffb3;
-            padding: 15px;
-            border-radius: 30px;
-            margin: 15px 0;
-            border: 2px solid #ffb347;
-        }
-        /* footer thông tin công ty */
-        .footer-info {
-            background: #003153;
-            color: #f2e6d9;
-            padding: 15px 20px;
-            font-size: 0.9rem;
-            border-top: 5px solid #ffcc00;
-            margin-top: 10px;
-        }
-        .footer-info i {
-            margin-right: 6px;
-            color: #ffcc66;
-        }
-        .footer-info .row {
+
+        .editor-preview-container {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .code-section, .preview-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            min-height: 400px;
+        }
+
+        .preview-section {
+            background: white;
+            border-left: 1px solid #333;
+        }
+
+        .section-header {
+            background: #252525;
+            color: white;
+            padding: 12px 20px;
+            display: flex;
             justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            min-height: 50px;
         }
-        .footer-info .col {
-            flex: 1 1 200px;
+
+        .section-title {
+            font-weight: 600;
+            font-size: 1.1rem;
         }
-        .highlight {
-            color: #ffcc00;
-            font-weight: bold;
+
+        .error-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--error-color);
         }
-        /* trạng thái mở */
-        .open .vehicle-area {
+
+        .error-indicator.hidden {
             display: none;
         }
-        .open .message-paper {
+
+        .tab-container {
+            display: flex;
+            background: #252525;
+            overflow-x: auto;
+            border-bottom: 1px solid #333;
+            scrollbar-width: thin;
+            scrollbar-color: #444 #252525;
+        }
+
+        .tab-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .tab-container::-webkit-scrollbar-track {
+            background: #252525;
+        }
+
+        .tab-container::-webkit-scrollbar-thumb {
+            background-color: #444;
+            border-radius: 3px;
+        }
+
+        .tab {
+            padding: 12px 18px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+            white-space: nowrap;
+            font-size: 0.95rem;
+            position: relative;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            background: #1e1e1e;
+            font-weight: 600;
+        }
+
+        .tab.has-error::after {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--error-color);
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+            transition: opacity 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: flex;
             opacity: 1;
-            transform: translateY(0);
+        }
+
+        .tab-content:not(.active) {
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        .CodeMirror {
+            height: 100%;
+            font-size: 14px;
+            line-height: 1.5;
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .CodeMirror-scroll {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .CodeMirror-lines {
+            width: 100% !important;
+        }
+
+        .CodeMirror-line {
+            width: 100% !important;
+        }
+
+        .CodeMirror-lint-mark-error {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-bottom: 2px dotted var(--error-color);
+        }
+
+        .CodeMirror-lint-tooltip {
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: var(--border-radius);
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            max-width: 300px;
+            padding: 8px 12px;
+            z-index: 1000;
+        }
+
+        .preview-container {
+            flex: 1;
+            padding: 0;
+            border: none;
+            overflow: auto;
             position: relative;
         }
-        .hidden {
-            display: none !important;
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
         }
-        .back-link {
-            text-align: center;
-            margin: 20px 0 0;
+
+        .iframe-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 1.2rem;
+            z-index: 10;
+            display: none;
+            animation: fadeIn 0.3s;
         }
-        .back-link a {
-            color: #fff9e6;
-            background: #b34700;
+
+        .iframe-overlay.active {
+            display: flex;
+        }
+
+        .iframe-overlay::before {
+            content: '';
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s infinite linear;
+            margin-right: 10px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 15px;
+            background: #252525;
+            border-top: 1px solid #333;
+            flex-wrap: wrap;
+        }
+
+        button {
             padding: 10px 20px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-weight: bold;
-            display: inline-block;
+            border: none;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+            position: relative;
+            overflow: hidden;
+            transform: translate3d(0,0,0);
+        }
+
+        button::after {
+            content: "";
+            display: block;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
+            background-repeat: no-repeat;
+            background-position: 50%;
+            transform: scale(10,10);
+            opacity: 0;
+            transition: transform .3s, opacity .5s;
+        }
+
+        button:active::after {
+            transform: scale(0,0);
+            opacity: .3;
+            transition: 0s;
+        }
+
+        .run-btn {
+            background: var(--primary-color);
+            color: white;
+            animation: glow 2s infinite alternate;
+        }
+
+        .run-btn:hover {
+            background: #3a5ecf;
+            transform: translateY(-2px);
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+
+        .clear-btn {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .clear-btn:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .reset-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        .error-panel {
+            background: #2d1a1a;
+            border-top: 1px solid #5c2c2c;
+            color: #f8a5a5;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            max-height: 120px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .error-panel.active {
+            display: block;
+        }
+
+        .error-item {
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .error-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .error-icon {
+            color: var(--error-color);
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .error-message {
+            flex: 1;
+        }
+
+        /* Responsive styles - nâng cấp cho mobile */
+        @media (max-width: 768px) {
+            .mobile-tabs {
+                display: flex;
+            }
+            
+            .preview-section {
+                border-left: none;
+            }
+            
+            .code-section, .preview-section {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: 1;
+            }
+            
+            .preview-section {
+                transform: translateX(100%);
+            }
+            
+            .code-section.active, .preview-section.active {
+                transform: translateX(0);
+                z-index: 2;
+            }
+            
+            .button-container {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                z-index: 100;
+                padding: 12px;
+                gap: 10px;
+                background: rgba(37, 37, 37, 0.95);
+                backdrop-filter: blur(10px);
+                border-top: 1px solid #444;
+                box-shadow: 0 -5px 20px rgba(0,0,0,0.5);
+            }
+            
+            button {
+                flex: 1;
+                padding: 12px 16px;
+                font-size: 1rem;
+                justify-content: center;
+                border-radius: 30px; /* Bo tròn hơn cho mobile */
+            }
+            
+            .run-btn {
+                animation: none; /* Tắt glow trên mobile để nhẹ hơn */
+                box-shadow: 0 4px 10px rgba(74, 110, 224, 0.5);
+            }
+            
+            .tab {
+                padding: 10px 14px;
+                font-size: 0.9rem;
+                min-width: 70px;
+            }
+            
+            .section-header {
+                padding: 10px 16px;
+                min-height: 46px;
+            }
+            
+            .section-title {
+                font-size: 1rem;
+            }
+            
+            .error-panel {
+                max-height: 100px;
+                padding: 10px 12px;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .tab-container {
+                padding: 0 8px;
+            }
+            
+            .tab {
+                padding: 10px 12px;
+                font-size: 0.85rem;
+                min-width: 60px;
+            }
+            
+            .button-container {
+                padding: 10px;
+            }
+            
+            button {
+                padding: 10px 12px;
+                font-size: 0.9rem;
+            }
+            
+            .mobile-tab {
+                padding: 12px 10px;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .tab {
+                padding: 8px 10px;
+                font-size: 0.8rem;
+                min-width: 55px;
+            }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+
+        /* Siêu hiệu ứng bổ sung */
+        @keyframes glow {
+            from { box-shadow: 0 0 10px -5px var(--primary-color); }
+            to { box-shadow: 0 0 20px 5px var(--primary-color); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Hiệu ứng hover cho tab */
+        .tab:hover {
+            background: #2a2a2a;
+        }
+
+        /* Hiệu ứng lỗi nhấp nháy nhẹ */
+        .has-error {
+            animation: errorPulse 1.5s infinite;
+        }
+
+        @keyframes errorPulse {
+            0% { border-bottom-color: transparent; }
+            50% { border-bottom-color: var(--error-color); }
+            100% { border-bottom-color: transparent; }
         }
     </style>
 </head>
 <body>
-    <div class="container" id="app">
-        <!-- Nội dung sẽ được render bằng JavaScript -->
+    <div class="container">
+        <div class="mobile-tabs">
+            <div class="mobile-tab active" data-tab="code">Code</div>
+            <div class="mobile-tab" data-tab="preview">Kết Quả</div>
+        </div>
+        
+        <div class="editor-preview-container">
+            <div class="code-section active">
+                <div class="section-header">
+                    <div class="section-title">Mã Nguồn</div>
+                    <div class="error-indicator hidden" id="error-indicator">
+                        <span>⚠</span> <span id="error-count">0 lỗi</span>
+                    </div>
+                </div>
+                <div class="tab-container">
+                    <div class="tab active" data-tab="html">HTML</div>
+                    <div class="tab" data-tab="css">CSS</div>
+                    <div class="tab" data-tab="js">JavaScript</div>
+                </div>
+                <div class="tab-content active" id="html-content">
+                    <textarea id="html-code"><!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang web của tôi</title>
+</head>
+<body>
+    <h1>Xin chào!</h1>
+    <p>Đây là trang web được tạo bằng trình soạn thảo HTML.</p>
+</body>
+</html></textarea>
+                </div>
+                <div class="tab-content" id="css-content">
+                    <textarea id="css-code">/* 
+ * TRÌNH SOẠN THẢO CSS
+ * 
+ * Nhập mã CSS của bạn vào đây. CSS sẽ được áp dụng trực tiếp vào trang HTML.
+ * 
+ * Ví dụ:
+ * - Để thay đổi màu nền: body { background-color: #f0f0f0; }
+ * - Để thay đổi font chữ: body { font-family: Arial, sans-serif; }
+ * - Để tạo hiệu ứng hover: button:hover { background-color: #4a6ee0; }
+ * 
+ * CSS được viết theo cú pháp: selector { property: value; }
+ */
+
+/* Bắt đầu viết CSS của bạn từ đây */</textarea>
+                </div>
+                <div class="tab-content" id="js-content">
+                    <textarea id="js-code">/* 
+ * TRÌNH SOẠN THẢO JAVASCRIPT
+ * 
+ * Nhập mã JavaScript của bạn vào đây. JS sẽ được thực thi trên trang HTML.
+ * 
+ * Ví dụ:
+ * - Hiển thị thông báo: alert('Xin chào!');
+ * - Thay đổi nội dung: document.getElementById('id').innerHTML = 'Nội dung mới';
+ * - Xử lý sự kiện: element.addEventListener('click', function() { ... });
+ * 
+ * Mẹo: Sử dụng console.log() để in ra kết quả kiểm tra
+ */
+
+// Bắt đầu viết JavaScript của bạn từ đây</textarea>
+                </div>
+                <div class="error-panel" id="error-panel">
+                    <!-- Lỗi sẽ được hiển thị ở đây -->
+                </div>
+            </div>
+
+            <div class="preview-section">
+                <div class="section-header">
+                    <div class="section-title">Kết Quả</div>
+                </div>
+                <div class="preview-container">
+                    <div class="iframe-overlay" id="iframe-overlay">
+                        <div>Đang tải...</div>
+                    </div>
+                    <iframe id="preview-frame"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <div class="button-container">
+            <button class="run-btn" id="run-btn">
+                 Chạy Mã
+            </button>
+            <button class="clear-btn" id="clear-btn">
+                 Xóa Tất Cả
+            </button>
+            <button class="reset-btn" id="reset-btn">
+                 Đặt Lại
+            </button>
+        </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/show-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/xml-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/css-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/javascript-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/hint/html-hint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/closetag.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/closebrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/matchtags.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/matchbrackets.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/comment/comment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/foldgutter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/xml-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/brace-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/indent-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/fold/comment-fold.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/selection/active-line.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/edit/trailingspace.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/lint/lint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/lint/javascript-lint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.15/addon/lint/css-lint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jshint/2.13.6/jshint.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/csslint/1.0.5/csslint.min.js"></script>
+    
     <script>
-        (function() {
-            // Helper: lấy tham số từ URL
-            const urlParams = new URLSearchParams(window.location.search);
-            const dataParam = urlParams.get('data');
-
-            // Đối tượng chứa dữ liệu thiệp (tên, lời chúc, ảnh base64)
-            let cardData = null;
-
-            // Tham chiếu tới container app
-            const app = document.getElementById('app');
-
-            // ---------- Hàm hiển thị form tạo thiệp ----------
-            function renderCreateForm() {
-                let formHtml = `
-                    <div class="header">
-                        <h1>🧧 CHÚC MỪNG NĂM MỚI 🧧</h1>
-                        <p>Mở phong bì xe - Nhận lộc đầu năm</p>
-                    </div>
-                    <div class="main-content">
-                        <div class="create-form">
-                            <div class="form-group">
-                                <label><i class="fas fa-user"></i> Tên người gửi</label>
-                                <input type="text" id="senderName" placeholder="Nhập tên của bạn ..." value="Anh Việt Nam">
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-heart"></i> Lời chúc Tết</label>
-                                <textarea id="greetingMsg" rows="3" placeholder="Lời chúc tốt đẹp ...">Chúc mừng năm mới! An khang thịnh vượng!</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-image"></i> Ảnh đại diện (nên chọn ảnh nhỏ < 100KB)</label>
-                                <div class="file-input-wrapper">
-                                    <div class="custom-file-btn"><i class="fas fa-upload"></i> Chọn file ảnh</div>
-                                    <input type="file" id="imageUpload" accept="image/*">
-                                </div>
-                                <div id="file-name">Chưa chọn file</div>
-                            </div>
-                            <button class="btn-primary" id="createCardBtn"><i class="fas fa-gift"></i> Tạo thiệp & link</button>
-                            
-                            <div id="linkOutput" class="link-result hidden">
-                                <input type="text" id="generatedLink" readonly value="">
-                                <button class="btn-copy" id="copyLinkBtn"><i class="fas fa-copy"></i> Copy</button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-                // Thêm footer thông tin công ty (theo ảnh mẫu)
-                formHtml += `
-                    <div class="footer-info">
-                        <div class="row">
-                            <div class="col"><i class="fas fa-phone-alt"></i> Hotline: 0123456789</div>
-                            <div class="col"><i class="fas fa-map-marker-alt"></i> Hà Nội - TP.HCM</div>
-                            <div class="col"><i class="fas fa-envelope"></i> info@aon.com.vn</div>
-                        </div>
-                        <div class="row" style="margin-top: 10px;">
-                            <div class="col"><i class="fas fa-users"></i> <span class="highlight">1000+</span> người dùng</div>
-                            <div class="col"><i class="fas fa-clock"></i> 24/7 hỗ trợ</div>
-                            <div class="col"><i class="fas fa-shield-alt"></i> AON global security</div>
-                        </div>
-                        <div style="text-align:center; margin-top: 8px;">⚙️ Engineer Beauty • Mát trước Mát sau ⚙️</div>
-                    </div>
-                `;
-
-                app.innerHTML = formHtml;
-
-                // Xử lý hiển thị tên file
-                const fileInput = document.getElementById('imageUpload');
-                const fileNameSpan = document.getElementById('file-name');
-                fileInput.addEventListener('change', function(e) {
-                    if (this.files && this.files[0]) {
-                        fileNameSpan.textContent = this.files[0].name + ' (' + (this.files[0].size / 1024).toFixed(1) + ' KB)';
+        // Khởi tạo CodeMirror editors với gợi ý code và tự động thụt đầu dòng
+        const htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-code'), {
+            mode: 'htmlmixed',
+            theme: 'material-darker',
+            lineNumbers: true,
+            autoCloseTags: true,
+            matchTags: true,
+            matchBrackets: true,
+            lineWrapping: true,
+            indentUnit: 4,
+            smartIndent: true,
+            indentWithTabs: false,
+            foldGutter: true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+            styleActiveLine: true,
+            showTrailingSpace: true,
+            extraKeys: {
+                "Tab": function(cm) {
+                    if (cm.somethingSelected()) {
+                        cm.indentSelection("add");
                     } else {
-                        fileNameSpan.textContent = 'Chưa chọn file';
+                        cm.replaceSelection(Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
                     }
-                });
+                },
+                "Shift-Tab": function(cm) {
+                    cm.indentSelection("subtract");
+                },
+                "'<'": function(cm) {
+                    cm.closeTag(cm, '>');
+                },
+                "'/'": function(cm) {
+                    cm.closeTag(cm, '>');
+                },
+                "'{'": function(cm) {
+                    cm.closeTag(cm, '}');
+                },
+                "'('": function(cm) {
+                    cm.closeTag(cm, ')');
+                },
+                "'['": function(cm) {
+                    cm.closeTag(cm, ']');
+                },
+                "Ctrl-Space": "autocomplete",
+                "Alt-Space": "autocomplete",
+                "Ctrl-Q": function(cm) { cm.foldCode(cm.getCursor()); },
+                "Ctrl-/": function(cm) { cm.toggleComment(); },
+                "Cmd-/": function(cm) { cm.toggleComment(); }
+            },
+            hintOptions: {
+                completeSingle: false
+            }
+        });
 
-                // Xử lý nút tạo thiệp
-                document.getElementById('createCardBtn').addEventListener('click', function() {
-                    const name = document.getElementById('senderName').value.trim() || 'Anh Việt Nam';
-                    const msg = document.getElementById('greetingMsg').value.trim() || 'Chúc mừng năm mới!';
-                    const file = fileInput.files[0];
-
-                    if (file) {
-                        // Kiểm tra dung lượng ảnh (cảnh báo nếu > 200KB)
-                        if (file.size > 200 * 1024) {
-                            alert('Ảnh lớn hơn 200KB, link có thể rất dài. Vẫn tiếp tục?', 'warning');
-                        }
-                        const reader = new FileReader();
-                        reader.onload = function(ev) {
-                            const base64 = ev.target.result; // data:image/png;base64,....
-                            buildLinkAndShow(name, msg, base64);
-                        };
-                        reader.readAsDataURL(file);
+        const cssEditor = CodeMirror.fromTextArea(document.getElementById('css-code'), {
+            mode: 'css',
+            theme: 'material-darker',
+            lineNumbers: true,
+            lineWrapping: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            indentUnit: 4,
+            smartIndent: true,
+            indentWithTabs: false,
+            foldGutter: true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+            styleActiveLine: true,
+            showTrailingSpace: true,
+            lint: {
+                getAnnotations: CodeMirror.lint.css,
+                async: true
+            },
+            extraKeys: {
+                "Tab": function(cm) {
+                    if (cm.somethingSelected()) {
+                        cm.indentSelection("add");
                     } else {
-                        // Không có ảnh, dùng ảnh mặc định (icon người)
-                        const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23ffaa33\' stroke=\'%23b34700\' stroke-width=\'5\'/%3E%3Ccircle cx=\'35\' cy=\'35\' r=\'8\' fill=\'%23333333\'/%3E%3Ccircle cx=\'65\' cy=\'35\' r=\'8\' fill=\'%23333333\'/%3E%3Cpath d=\'M30 65 Q50 80 70 65\' stroke=\'%23663300\' stroke-width=\'6\' fill=\'none\' stroke-linecap=\'round\' /%3E%3C/svg%3E';
-                        buildLinkAndShow(name, msg, defaultAvatar);
+                        cm.replaceSelection(Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
                     }
-                });
+                },
+                "Shift-Tab": function(cm) {
+                    cm.indentSelection("subtract");
+                },
+                "Ctrl-Space": "autocomplete",
+                "Alt-Space": "autocomplete",
+                "Ctrl-/": function(cm) { cm.toggleComment(); },
+                "Cmd-/": function(cm) { cm.toggleComment(); }
+            },
+            hintOptions: {
+                completeSingle: false
+            }
+        });
 
-                // Hàm tạo link và hiển thị
-                function buildLinkAndShow(name, msg, imgBase64) {
-                    const card = {
-                        name: name,
-                        message: msg,
-                        image: imgBase64
-                    };
-                    const jsonStr = JSON.stringify(card);
-                    const compressed = LZString.compressToEncodedURIComponent(jsonStr);
-                    const link = window.location.origin + window.location.pathname + '?data=' + compressed;
+        const jsEditor = CodeMirror.fromTextArea(document.getElementById('js-code'), {
+            mode: 'javascript',
+            theme: 'material-darker',
+            lineNumbers: true,
+            lineWrapping: true,
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            indentUnit: 4,
+            smartIndent: true,
+            indentWithTabs: false,
+            foldGutter: true,
+            gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"],
+            styleActiveLine: true,
+            showTrailingSpace: true,
+            lint: {
+                getAnnotations: CodeMirror.lint.javascript,
+                options: {
+                    esversion: 6,
+                    undef: true,
+                    unused: true
+                },
+                async: true
+            },
+            extraKeys: {
+                "Tab": function(cm) {
+                    if (cm.somethingSelected()) {
+                        cm.indentSelection("add");
+                    } else {
+                        cm.replaceSelection(Array(cm.getOption("indentUnit") + 1).join(" "), "end", "+input");
+                    }
+                },
+                "Shift-Tab": function(cm) {
+                    cm.indentSelection("subtract");
+                },
+                "Ctrl-Space": "autocomplete",
+                "Alt-Space": "autocomplete",
+                "Ctrl-/": function(cm) { cm.toggleComment(); },
+                "Cmd-/": function(cm) { cm.toggleComment(); }
+            },
+            hintOptions: {
+                completeSingle: false
+            }
+        });
 
-                    const linkOutput = document.getElementById('linkOutput');
-                    const generatedLink = document.getElementById('generatedLink');
-                    generatedLink.value = link;
-                    linkOutput.classList.remove('hidden');
+        // Tự động hiển thị gợi ý khi nhập
+        htmlEditor.on("inputRead", function(cm, change) {
+            if (change.text.length > 0 && change.text[0].length > 0) {
+                CodeMirror.commands.autocomplete(cm, null, {completeSingle: false});
+            }
+        });
 
-                    // Cuộn tới link
-                    linkOutput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        cssEditor.on("inputRead", function(cm, change) {
+            if (change.text.length > 0 && change.text[0].length > 0) {
+                CodeMirror.commands.autocomplete(cm, null, {completeSingle: false});
+            }
+        });
+
+        jsEditor.on("inputRead", function(cm, change) {
+            if (change.text.length > 0 && change.text[0].length > 0) {
+                CodeMirror.commands.autocomplete(cm, null, {completeSingle: false});
+            }
+        });
+
+        // Xử lý paste cho mobile - đảm bảo dán được code dài
+        function setupPasteHandler(editor) {
+            editor.on('paste', (cm, event) => {
+                event.preventDefault();
+                let text = event.clipboardData.getData('text/plain');
+                if (text) {
+                    let cursor = editor.getCursor();
+                    editor.replaceRange(text, cursor);
                 }
+            });
+        }
+        setupPasteHandler(htmlEditor);
+        setupPasteHandler(cssEditor);
+        setupPasteHandler(jsEditor);
 
-                // Copy link
-                document.getElementById('copyLinkBtn').addEventListener('click', function() {
-                    const linkInput = document.getElementById('generatedLink');
-                    linkInput.select();
-                    navigator.clipboard.writeText(linkInput.value).then(() => {
-                        alert('Đã copy link! Gửi cho bạn bè nhé.');
-                    }).catch(() => {
-                        alert('Copy thủ công nha: ' + linkInput.value);
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                const tabId = tab.getAttribute('data-tab');
+                document.getElementById(`${tabId}-content`).classList.add('active');
+                
+                // Refresh the editor to ensure proper rendering
+                setTimeout(() => {
+                    if (tabId === 'html') htmlEditor.refresh();
+                    if (tabId === 'css') cssEditor.refresh();
+                    if (tabId === 'js') jsEditor.refresh();
+                }, 10);
+            });
+        });
+
+        // Mobile tab switching
+        const mobileTabs = document.querySelectorAll('.mobile-tab');
+        const codeSection = document.querySelector('.code-section');
+        const previewSection = document.querySelector('.preview-section');
+
+        mobileTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                mobileTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const tabType = tab.getAttribute('data-tab');
+                if (tabType === 'code') {
+                    codeSection.classList.add('active');
+                    previewSection.classList.remove('active');
+                } else {
+                    codeSection.classList.remove('active');
+                    previewSection.classList.add('active');
+                }
+            });
+        });
+
+        // Run code functionality
+        const runBtn = document.getElementById('run-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const previewFrame = document.getElementById('preview-frame');
+        const iframeOverlay = document.getElementById('iframe-overlay');
+        const errorIndicator = document.getElementById('error-indicator');
+        const errorCount = document.getElementById('error-count');
+        const errorPanel = document.getElementById('error-panel');
+
+        // Hàm kiểm tra lỗi
+        function checkForErrors() {
+            let totalErrors = 0;
+            const allErrors = [];
+            
+            // Kiểm tra lỗi HTML cơ bản
+            const htmlCode = htmlEditor.getValue();
+            const htmlErrors = validateHTML(htmlCode);
+            totalErrors += htmlErrors.length;
+            allErrors.push(...htmlErrors.map(e => ({...e, type: 'HTML'})));
+            
+            // Lỗi CSS và JS được phát hiện bởi CodeMirror lint
+            const cssState = cssEditor.state.lint.marked;
+            const jsState = jsEditor.state.lint.marked;
+            
+            if (cssState && cssState.length > 0) {
+                totalErrors += cssState.length;
+                allErrors.push(...cssState.map(m => ({
+                    message: m.message,
+                    type: 'CSS',
+                    line: m.from.line + 1
+                })));
+            }
+            
+            if (jsState && jsState.length > 0) {
+                totalErrors += jsState.length;
+                allErrors.push(...jsState.map(m => ({
+                    message: m.message,
+                    type: 'JavaScript',
+                    line: m.from.line + 1
+                })));
+            }
+            
+            // Cập nhật giao diện hiển thị lỗi
+            updateErrorDisplay(totalErrors, allErrors);
+            
+            return totalErrors;
+        }
+        
+        // Hàm kiểm tra HTML cơ bản
+        function validateHTML(html) {
+            const errors = [];
+            
+            // Kiểm tra thẻ đóng mở cơ bản
+            const openTags = html.match(/<(\w+)[^>]*>/g) || [];
+            const closeTags = html.match(/<\/(\w+)>/g) || [];
+            
+            // Đếm số lượng thẻ mở và đóng
+            const tagCount = {};
+            
+            openTags.forEach(tag => {
+                const tagName = tag.match(/<(\w+)/)[1].toLowerCase();
+                if (tagName !== 'br' && tagName !== 'hr' && tagName !== 'img' && tagName !== 'meta' && tagName !== 'link') {
+                    tagCount[tagName] = (tagCount[tagName] || 0) + 1;
+                }
+            });
+            
+            closeTags.forEach(tag => {
+                const tagName = tag.match(/<\/(\w+)>/)[1].toLowerCase();
+                if (tagCount[tagName]) {
+                    tagCount[tagName]--;
+                } else {
+                    errors.push({
+                        message: `Thẻ đóng </${tagName}> không có thẻ mở tương ứng`,
+                        line: findLineNumber(html, tag)
                     });
-                });
-            }
-
-            // ---------- Hàm hiển thị thiệp từ dữ liệu (đã giải nén) ----------
-            function renderCardFromData(data) {
-                // data là object {name, message, image}
-                const name = data.name || 'Người gửi';
-                const msg = data.message || 'Lời chúc tốt đẹp';
-                const imgSrc = data.image || '';
-
-                let cardHtml = `
-                    <div class="header">
-                        <h1>🧧 MỞ PHONG BÌ XE 🧧</h1>
-                        <p>Nhấn vào xe để nhận lộc</p>
-                    </div>
-                    <div class="main-content">
-                        <div class="card-envelope" id="envelopeCard">
-                            <div id="vehiclePart" class="vehicle-area">
-                                <div class="vehicle-icon">
-                                    <i class="fas fa-truck-pickup"></i>
-                                </div>
-                                <p><i class="fas fa-hand-pointer"></i> Nhấn vào xe mở thiệp</p>
-                            </div>
-                            <div id="paperPart" class="message-paper hidden">
-                                <img src="${imgSrc}" alt="avatar" class="avatar" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23ccc\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'50\' text-anchor=\'middle\' fill=\'%23666\'%3E👤%3C/text%3E%3C/svg%3E'">
-                                <div class="paper-content">
-                                    <h2>✉️ THƯ NGỎ ✉️</h2>
-                                    <div class="name-tag">${name}</div>
-                                    <div class="greeting"><i class="fas fa-quote-left"></i> ${msg} <i class="fas fa-quote-right"></i></div>
-                                    <p style="font-size:1.5rem">🧧🧧🧧</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="back-link">
-                        <a href="${window.location.origin + window.location.pathname}"><i class="fas fa-arrow-left"></i> Tạo thiệp của bạn</a>
-                    </div>
-                `;
-
-                // Thêm footer giống form
-                cardHtml += `
-                    <div class="footer-info">
-                        <div class="row">
-                            <div class="col"><i class="fas fa-phone-alt"></i> 0123456789</div>
-                            <div class="col"><i class="fas fa-map-marker-alt"></i> Hà Nội - TP.HCM</div>
-                            <div class="col"><i class="fas fa-envelope"></i> info@aon.com.vn</div>
-                        </div>
-                        <div class="row" style="margin-top: 10px;">
-                            <div class="col"><i class="fas fa-users"></i> <span class="highlight">1000+</span> người dùng</div>
-                            <div class="col"><i class="fas fa-clock"></i> 24/7</div>
-                            <div class="col"><i class="fas fa-shield-alt"></i> AON global</div>
-                        </div>
-                        <div style="text-align:center; margin-top: 8px;">⚙️ Engineer Beauty • Mát trước Mát sau ⚙️</div>
-                    </div>
-                `;
-
-                app.innerHTML = cardHtml;
-
-                // Gắn sự kiện click vào xe để mở thiệp
-                const vehicle = document.getElementById('vehiclePart');
-                const paper = document.getElementById('paperPart');
-                const envelope = document.getElementById('envelopeCard');
-
-                vehicle.addEventListener('click', function() {
-                    envelope.classList.add('open');
-                    vehicle.style.display = 'none'; // ẩn xe
-                    paper.classList.remove('hidden');
-                });
-            }
-
-            // ---------- Xử lý routing ----------
-            if (dataParam) {
-                try {
-                    const decompressed = LZString.decompressFromEncodedURIComponent(dataParam);
-                    if (decompressed) {
-                        cardData = JSON.parse(decompressed);
-                        renderCardFromData(cardData);
-                    } else {
-                        // dữ liệu rỗng -> về form
-                        renderCreateForm();
-                    }
-                } catch (e) {
-                    console.error('Lỗi giải mã:', e);
-                    renderCreateForm();
                 }
-            } else {
-                renderCreateForm();
+            });
+            
+            // Kiểm tra thẻ mở không đóng
+            Object.keys(tagCount).forEach(tagName => {
+                if (tagCount[tagName] > 0) {
+                    errors.push({
+                        message: `Thẻ mở <${tagName}> không có thẻ đóng tương ứng`,
+                        line: findLineNumber(html, `<${tagName}`)
+                    });
+                }
+            });
+            
+            return errors;
+        }
+        
+        // Tìm số dòng của một chuỗi trong mã nguồn
+        function findLineNumber(text, searchString) {
+            const lines = text.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+                if (lines[i].includes(searchString)) {
+                    return i + 1;
+                }
             }
-        })();
+            return 1;
+        }
+        
+        // Cập nhật hiển thị lỗi
+        function updateErrorDisplay(errorCount, errors) {
+            // Cập nhật chỉ báo lỗi
+            if (errorCount > 0) {
+                errorIndicator.classList.remove('hidden');
+                errorCount.textContent = `${errorCount} lỗi`;
+            } else {
+                errorIndicator.classList.add('hidden');
+            }
+            
+            // Cập nhật tab lỗi
+            tabs.forEach(tab => {
+                const tabType = tab.getAttribute('data-tab');
+                const hasError = errors.some(e => e.type.toLowerCase() === tabType);
+                
+                if (hasError) {
+                    tab.classList.add('has-error');
+                } else {
+                    tab.classList.remove('has-error');
+                }
+            });
+            
+            // Cập nhật mobile tab lỗi
+            const hasAnyError = errorCount > 0;
+            const codeMobileTab = document.querySelector('.mobile-tab[data-tab="code"]');
+            if (hasAnyError) {
+                codeMobileTab.classList.add('has-error');
+            } else {
+                codeMobileTab.classList.remove('has-error');
+            }
+            
+            // Cập nhật panel lỗi
+            if (errorCount > 0) {
+                errorPanel.classList.add('active');
+                errorPanel.innerHTML = '';
+                
+                errors.forEach(error => {
+                    const errorItem = document.createElement('div');
+                    errorItem.className = 'error-item';
+                    
+                    const errorIcon = document.createElement('div');
+                    errorIcon.className = 'error-icon';
+                    errorIcon.textContent = '●';
+                    
+                    const errorMessage = document.createElement('div');
+                    errorMessage.className = 'error-message';
+                    errorMessage.textContent = `[${error.type}] Dòng ${error.line}: ${error.message}`;
+                    
+                    errorItem.appendChild(errorIcon);
+                    errorItem.appendChild(errorMessage);
+                    errorPanel.appendChild(errorItem);
+                });
+            } else {
+                errorPanel.classList.remove('active');
+            }
+        }
+
+        function runCode() {
+            // Hiển thị overlay tải
+            iframeOverlay.classList.add('active');
+            
+            // Kiểm tra lỗi trước khi chạy
+            const errorCount = checkForErrors();
+            
+            const html = htmlEditor.getValue();
+            const css = cssEditor.getValue();
+            const js = jsEditor.getValue();
+            
+            const previewDocument = previewFrame.contentDocument || previewFrame.contentWindow.document;
+            
+            // Tạo tài liệu HTML hoàn chỉnh với mã được cung cấp
+            const fullHtml = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <style>${css}</style>
+                </head>
+                <body>
+                    ${html}
+                    <script>${js}<\/script>
+                </body>
+                </html>
+            `;
+            
+            previewDocument.open();
+            previewDocument.write(fullHtml);
+            previewDocument.close();
+            
+            // Ẩn overlay sau khi tải xong
+            setTimeout(() => {
+                iframeOverlay.classList.remove('active');
+            }, 500);
+        }
+
+        function clearAllCode() {
+            if (confirm('Bạn có chắc chắn muốn xóa tất cả mã? Hành động này không thể hoàn tác.')) {
+                htmlEditor.setValue('');
+                cssEditor.setValue('');
+                jsEditor.setValue('');
+                runCode();
+            }
+        }
+
+        function resetToDefault() {
+            if (confirm('Bạn có muốn đặt lại tất cả về trạng thái ban đầu?')) {
+                htmlEditor.setValue(`<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang web của tôi</title>
+</head>
+<body>
+    <h1>Xin chào!</h1>
+    <p>Đây là trang web được tạo bằng trình soạn thảo HTML.</p>
+</body>
+</html>`);
+                cssEditor.setValue(`/* 
+ * TRÌNH SOẠN THẢO CSS
+ * 
+ * Nhập mã CSS của bạn vào đây. CSS sẽ được áp dụng trực tiếp vào trang HTML.
+ * 
+ * Ví dụ:
+ * - Để thay đổi màu nền: body { background-color: #f0f0f0; }
+ * - Để thay đổi font chữ: body { font-family: Arial, sans-serif; }
+ * - Để tạo hiệu ứng hover: button:hover { background-color: #4a6ee0; }
+ * 
+ * CSS được viết theo cú pháp: selector { property: value; }
+ */
+
+/* Bắt đầu viết CSS của bạn từ đây */`);
+                jsEditor.setValue(`/* 
+ * TRÌNH SOẠN THẢO JAVASCRIPT
+ * 
+ * Nhập mã JavaScript của bạn vào đây. JS sẽ được thực thi trên trang HTML.
+ * 
+ * Ví dụ:
+ * - Hiển thị thông báo: alert('Xin chào!');
+ * - Thay đổi nội dung: document.getElementById('id').innerHTML = 'Nội dung mới';
+ * - Xử lý sự kiện: element.addEventListener('click', function() { ... });
+ * 
+ * Mẹo: Sử dụng console.log() để in ra kết quả kiểm tra
+ */
+
+// Bắt đầu viết JavaScript của bạn từ đây`);
+                runCode();
+            }
+        }
+
+        // --- TỰ ĐỘNG CHẠY MÃ KHI NHẬP XONG ---
+        let autoRunTimeout;
+        [htmlEditor, cssEditor, jsEditor].forEach(editor => {
+            editor.on('change', () => {
+                clearTimeout(autoRunTimeout);
+                autoRunTimeout = setTimeout(() => {
+                    runCode();  // tự động chạy code sau 1.5 giây dừng gõ
+                }, 1500);
+            });
+        });
+
+        // Event listeners - có clearTimeout để tránh chạy trùng
+        runBtn.addEventListener('click', () => {
+            clearTimeout(autoRunTimeout);
+            runCode();
+        });
+        clearBtn.addEventListener('click', () => {
+            clearTimeout(autoRunTimeout);
+            clearAllCode();
+        });
+        resetBtn.addEventListener('click', () => {
+            clearTimeout(autoRunTimeout);
+            resetToDefault();
+        });
+
+        // Chạy code khi tải trang
+        document.addEventListener('DOMContentLoaded', runCode);
+        
+        // Xử lý thay đổi kích thước màn hình
+        window.addEventListener('resize', function() {
+            [htmlEditor, cssEditor, jsEditor].forEach(editor => {
+                editor.refresh();
+            });
+        });
     </script>
 </body>
 </html>
