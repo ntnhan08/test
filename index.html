@@ -2,730 +2,544 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-    <meta name="description" content="Tải video TikTok chất lượng cao miễn phí - Hỗ trợ MP4/MP3">
-    <meta name="keywords" content="tải tiktok, download tiktok, tiktok downloader, video tiktok">
-    <title>TikTok Video Downloader PRO - Tải Video TikTok Miễn Phí</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⬇️</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiệp Tết - Mở phong bì xe</title>
+    <!-- Font Awesome cho icon xe, phong bì -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Thư viện nén dữ liệu cho phép đính kèm ảnh base64 vào URL -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #10b981;
-            --dark: #1f2937;
-            --darker: #111827;
-            --light: #f9fafb;
-            --gray: #6b7280;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.15);
-            --danger: #ef4444;
-            --warning: #f59e0b;
-            --tiktok-pink: #ff0050;
-            --tiktok-black: #000000;
-            --success: #10b981;
-            --info: #3b82f6;
-        }
-        
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            -webkit-tap-highlight-color: transparent;
         }
-        
         body {
-            background: linear-gradient(135deg, var(--darker), #000);
-            color: var(--light);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(145deg, #990000 0%, #cc3300 100%);
             min-height: 100vh;
-            padding: 12px;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            -webkit-overflow-scrolling: touch;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            margin: 0;
         }
-        
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        /* Header */
-        header {
-            text-align: center;
-            padding: 20px 0 15px;
-            margin-bottom: 15px;
-        }
-        
-        .logo {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-        
-        .logo-icon {
-            font-size: 2.2rem;
-            background: linear-gradient(45deg, #ff0050, #00f2ea);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        
-        h1 {
-            font-size: 1.8rem;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            margin-bottom: 6px;
-        }
-        
-        .tagline {
-            color: var(--gray);
-            font-size: 0.95rem;
-            margin-bottom: 8px;
-            padding: 0 10px;
-            line-height: 1.4;
-        }
-        
-        /* Mode Switch */
-        .mode-switch {
-            display: flex;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 50px;
-            padding: 4px;
-            margin-bottom: 15px;
-            gap: 4px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        .switch-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--gray);
-            padding: 12px 16px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            font-weight: 500;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        
-        .switch-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
-        }
-        
-        /* Search Section */
-        .search-section {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-        
-        .search-section.active {
-            display: block;
-        }
-        
-        .search-container {
-            margin-bottom: 20px;
-        }
-        
-        .search-input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        #searchKeywords {
-            flex: 1;
-            padding: 16px 20px;
-            border-radius: 14px;
-            border: 2px solid var(--border);
-            background: rgba(0, 0, 0, 0.4);
-            color: var(--light);
-            font-size: 1rem;
-            transition: all 0.3s;
-        }
-        
-        #searchKeywords:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-        
-        #searchBtn {
-            background: linear-gradient(135deg, var(--info), #2563eb);
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 0 24px;
-            white-space: nowrap;
-        }
-        
-        #searchBtn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
-        }
-        
-        #searchBtn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .search-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        
-        .filter-select {
-            flex: 1;
-            min-width: 150px;
-            padding: 12px 16px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.4);
-            color: var(--light);
-            font-size: 0.9rem;
-            transition: all 0.3s;
-        }
-        
-        .filter-select:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-        
-        /* Search Results */
-        .search-results-container {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-        
-        .search-results-container.active {
-            display: block;
-        }
-        
-        .search-results-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid var(--border);
-        }
-        
-        .search-results-count {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-        
-        .search-results-controls {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .search-results-controls button {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        #selectAllBtn {
-            background: rgba(99, 102, 241, 0.2);
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
-        
-        #deselectAllBtn {
-            background: rgba(239, 68, 68, 0.2);
-            color: var(--danger);
-            border: 1px solid var(--danger);
-        }
-        
-        #downloadSelectedBtn {
-            background: linear-gradient(135deg, var(--success), #0ca678);
-            color: white;
-            border: none;
-        }
-        
-        #downloadSelectedBtn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .search-results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .search-result-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            overflow: hidden;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-            position: relative;
-        }
-        
-        .search-result-item.selected {
-            border-color: var(--primary);
-            box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
-        }
-        
-        .result-thumbnail {
+            max-width: 700px;
             width: 100%;
-            height: 180px;
+            background: #fff9e6;
+            border: 6px solid #ffcc00;
+            border-radius: 40px 40px 20px 20px;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5), inset 0 0 20px #ffeb99;
+            overflow: hidden;
+            position: relative;
+        }
+        /* Phần trang trí Tết */
+        .header {
+            background: #ffd966;
+            padding: 20px 10px 10px;
+            text-align: center;
+            clip-path: polygon(0% 0%, 100% 0%, 95% 100%, 5% 100%);
+        }
+        .header h1 {
+            font-size: 2.2rem;
+            color: #b30000;
+            text-shadow: 3px 3px 0 #ffff99;
+            letter-spacing: 4px;
+            margin: 0;
+            font-weight: 900;
+        }
+        .header p {
+            font-size: 1rem;
+            color: #660000;
+            font-style: italic;
+        }
+        .main-content {
+            padding: 30px 25px 40px;
+        }
+        /* FORM tạo thiệp */
+        .create-form {
+            background: #ffeedd;
+            border-radius: 30px;
+            padding: 25px;
+            border: 2px dashed #ffaa00;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            color: #a30000;
+            margin-bottom: 8px;
+            font-size: 1.2rem;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #ff9933;
+            border-radius: 50px;
+            font-size: 1rem;
+            outline: none;
+            transition: 0.2s;
+            background: #fffff0;
+        }
+        .form-group textarea {
+            border-radius: 25px;
+            resize: vertical;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            border-color: #cc0000;
+            box-shadow: 0 0 0 4px #ffcccc;
+        }
+        .file-input-wrapper {
             position: relative;
             overflow: hidden;
-            cursor: pointer;
+            display: inline-block;
+            width: 100%;
         }
-        
-        .result-thumbnail img {
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s;
-        }
-        
-        .result-thumbnail:hover img {
-            transform: scale(1.05);
-        }
-        
-        .result-thumbnail-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(to bottom, transparent 60%, rgba(0,0,0,0.8) 100%);
-            display: flex;
-            align-items: flex-end;
-            padding: 10px;
-        }
-        
-        .result-duration {
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .result-select-checkbox {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 2;
-        }
-        
-        .result-select-checkbox input {
-            width: 20px;
-            height: 20px;
             cursor: pointer;
         }
-        
-        .result-info {
-            padding: 12px;
-        }
-        
-        .result-title {
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 8px;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            line-height: 1.4;
-        }
-        
-        .result-author {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            color: var(--gray);
-            font-size: 0.8rem;
-            margin-bottom: 6px;
-        }
-        
-        .result-author img {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-        }
-        
-        .result-stats {
-            display: flex;
-            justify-content: space-between;
-            color: var(--gray);
-            font-size: 0.75rem;
-            margin-top: 8px;
-        }
-        
-        .result-stat {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .result-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        
-        .result-action-btn {
-            flex: 1;
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: none;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-        }
-        
-        .result-preview-btn {
-            background: rgba(99, 102, 241, 0.2);
-            color: var(--primary);
-            border: 1px solid var(--primary);
-        }
-        
-        .result-preview-btn:hover {
-            background: rgba(99, 102, 241, 0.3);
-        }
-        
-        .result-download-btn {
-            background: linear-gradient(135deg, var(--success), #0ca678);
-            color: white;
-        }
-        
-        .result-download-btn:hover {
-            opacity: 0.9;
-        }
-        
-        /* Pagination */
-        .search-pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .page-btn {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            background: rgba(0, 0, 0, 0.3);
-            color: var(--light);
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .page-btn:hover:not(:disabled) {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .page-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .page-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .page-info {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-        
-        /* Selected Counter */
-        .selected-counter {
-            position: fixed;
-            bottom: 80px;
-            right: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
+        .custom-file-btn {
+            background: #ffbb33;
+            border: 2px solid #b34700;
+            color: #4d1f00;
             padding: 12px 20px;
-            border-radius: 25px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-            display: none;
-            align-items: center;
-            gap: 8px;
-            z-index: 1000;
-            animation: slideInBottom 0.3s;
-        }
-        
-        .selected-counter.active {
-            display: flex;
-        }
-        
-        /* Loading for search */
-        .search-loading {
+            border-radius: 50px;
             text-align: center;
-            padding: 40px 20px;
-            display: none;
-        }
-        
-        .search-loading.active {
-            display: block;
-        }
-        
-        .search-spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            border-top-color: var(--info);
-            margin: 0 auto 15px;
-            animation: spin 1s linear infinite;
-        }
-        
-        /* No results */
-        .no-results {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--gray);
-            display: none;
-        }
-        
-        .no-results.active {
-            display: block;
-        }
-        
-        .no-results i {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-        
-        /* Input Section */
-        .input-section {
-            margin-bottom: 25px;
-        }
-        
-        .input-container {
-            position: relative;
-            margin-bottom: 15px;
-        }
-        
-        #videoUrl {
+            font-weight: bold;
+            display: inline-block;
             width: 100%;
-            padding: 20px 70px 20px 20px;
-            border-radius: 16px;
-            border: 2px solid var(--border);
-            background: rgba(0, 0, 0, 0.4);
-            color: var(--light);
-            font-size: 1.1rem;
-            transition: all 0.3s;
-            font-size: 16px;
-            height: 60px;
-            -webkit-appearance: none;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        
-        #multiVideoUrls {
+        .custom-file-btn:hover {
+            background: #ffaa00;
+        }
+        #file-name {
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #704214;
+        }
+        .btn-primary {
+            background: #cc3300;
+            color: #ffecb3;
+            border: none;
+            padding: 18px 25px;
+            border-radius: 60px;
+            font-size: 1.5rem;
+            font-weight: bold;
             width: 100%;
-            padding: 20px 70px 20px 20px;
-            border-radius: 16px;
-            border: 2px solid var(--border);
-            background: rgba(0, 0, 0, 0.4);
-            color: var(--light);
-            font-size: 1.1rem;
-            transition: all 0.3s;
-            resize: vertical;
-            min-height: 140px;
-            display: none;
-            font-size: 16px;
-            -webkit-appearance: none;
-        }
-        
-        #videoUrl:focus, #multiVideoUrls:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        }
-        
-        .input-actions {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        
-        .multi-input-actions {
-            position: absolute;
-            right: 15px;
-            top: 15px;
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-        
-        .clear-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: var(--light);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
             cursor: pointer;
-            transition: all 0.3s;
+            box-shadow: 0 8px 0 #661100;
+            transition: 0.1s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .btn-primary:active {
+            transform: translateY(5px);
+            box-shadow: 0 3px 0 #661100;
+        }
+        .link-result {
+            margin-top: 25px;
+            background: #ffffcc;
+            padding: 15px;
+            border-radius: 40px;
+            border: 2px solid #ffaa33;
             display: flex;
+            gap: 10px;
             align-items: center;
-            justify-content: center;
-            font-size: 1rem;
         }
-        
-        .clear-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--danger);
+        .link-result input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #cc7a00;
+            border-radius: 50px;
+            background: white;
+            font-size: 0.9rem;
         }
-        
-        .quick-clear-btn {
-            background: rgba(239, 68, 68, 0.2);
+        .btn-copy {
+            background: #2e7d32;
+            color: white;
             border: none;
-            color: var(--danger);
-            padding: 8px 16px;
-            border-radius: 20px;
+            padding: 12px 20px;
+            border-radius: 40px;
+            font-weight: bold;
             cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
             white-space: nowrap;
         }
-        
-        .quick-clear-btn:hover {
-            background: rgba(239, 68, 68, 0.3);
+        /* THIỆP chúc (xe mở) */
+        .card-envelope {
+            background: #ffeedd;
+            border-radius: 50px 50px 30px 30px;
+            padding: 20px 15px;
+            border: 3px solid #ffaa33;
+            box-shadow: inset 0 0 0 5px #fff2cc;
         }
-        
-        #downloadBtn {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            border: none;
-            border-radius: 14px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+        .vehicle-area {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 16px 30px;
-            width: auto;
-            margin: 0 auto;
-            min-width: 160px;
+            cursor: pointer;
+            transition: 0.3s;
+            background: #ffd9b3;
+            border-radius: 100px 100px 30px 30px;
+            padding: 30px 20px 20px;
+            border-bottom: 8px solid #b36b00;
         }
-        
-        #downloadBtn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+        .vehicle-icon {
+            font-size: 7rem;
+            color: #b34700;
+            filter: drop-shadow(8px 8px 0 #ffb347);
+            transition: 0.2s;
         }
-        
-        #downloadBtn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
+        .vehicle-icon i {
+            transform: rotate(0deg);
         }
-        
-        /* Loading */
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 30px;
+        .vehicle-area p {
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: #ffcc66;
+            padding: 8px 20px;
+            border-radius: 40px;
+            color: #663300;
+            margin-top: 10px;
+            border: 2px solid #cc7a00;
         }
-        
-        .loading.active {
-            display: block;
-            animation: fadeIn 0.3s;
+        .message-paper {
+            background: #fff3d6;
+            border-radius: 30px 30px 15px 15px;
+            padding: 25px;
+            border: 4px solid #cc7a00;
+            box-shadow: 0 10px 0 #995c00;
+            transform: translateY(20px);
+            transition: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            margin-top: 10px;
+            position: relative;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+        .message-paper.hidden {
+            opacity: 0;
+            transform: translateY(-30px) scale(0.9);
+            pointer-events: none;
+            position: absolute;
         }
-        
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
+        .avatar {
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            border-top-color: var(--primary);
+            object-fit: cover;
+            border: 5px solid #ffaa00;
             margin: 0 auto 15px;
-            animation: spin 1s linear infinite;
+            display: block;
+            background: #ccc;
         }
-        
-        @keyframes spin {
-            100% { transform: rotate(360deg); }
+        .paper-content {
+            text-align: center;
         }
-        
-        /* Video Info */
-        .video-info-section {
+        .paper-content h2 {
+            color: #b34100;
+            font-size: 2rem;
+            border-bottom: 3px dashed #ffaa33;
+            padding-bottom: 10px;
+        }
+        .paper-content .name-tag {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #cc3300;
+        }
+        .paper-content .greeting {
+            font-size: 1.3rem;
+            background: #ffffb3;
+            padding: 15px;
+            border-radius: 30px;
+            margin: 15px 0;
+            border: 2px solid #ffb347;
+        }
+        /* footer thông tin công ty */
+        .footer-info {
+            background: #003153;
+            color: #f2e6d9;
+            padding: 15px 20px;
+            font-size: 0.9rem;
+            border-top: 5px solid #ffcc00;
+            margin-top: 10px;
+        }
+        .footer-info i {
+            margin-right: 6px;
+            color: #ffcc66;
+        }
+        .footer-info .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: space-between;
+        }
+        .footer-info .col {
+            flex: 1 1 200px;
+        }
+        .highlight {
+            color: #ffcc00;
+            font-weight: bold;
+        }
+        /* trạng thái mở */
+        .open .vehicle-area {
             display: none;
-            animation: slideUp 0.5s;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 20px;
-            margin-top: 20px;
         }
-        
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
+        .open .message-paper {
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+        }
+        .hidden {
+            display: none !important;
+        }
+        .back-link {
+            text-align: center;
+            margin: 20px 0 0;
+        }
+        .back-link a {
+            color: #fff9e6;
+            background: #b34700;
+            padding: 10px 20px;
+            border-radius: 40px;
+            text-decoration: none;
+            font-weight: bold;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="app">
+        <!-- Nội dung sẽ được render bằng JavaScript -->
+    </div>
+
+    <script>
+        (function() {
+            // Helper: lấy tham số từ URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const dataParam = urlParams.get('data');
+
+            // Đối tượng chứa dữ liệu thiệp (tên, lời chúc, ảnh base64)
+            let cardData = null;
+
+            // Tham chiếu tới container app
+            const app = document.getElementById('app');
+
+            // ---------- Hàm hiển thị form tạo thiệp ----------
+            function renderCreateForm() {
+                let formHtml = `
+                    <div class="header">
+                        <h1>🧧 CHÚC MỪNG NĂM MỚI 🧧</h1>
+                        <p>Mở phong bì xe - Nhận lộc đầu năm</p>
+                    </div>
+                    <div class="main-content">
+                        <div class="create-form">
+                            <div class="form-group">
+                                <label><i class="fas fa-user"></i> Tên người gửi</label>
+                                <input type="text" id="senderName" placeholder="Nhập tên của bạn ..." value="Anh Việt Nam">
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-heart"></i> Lời chúc Tết</label>
+                                <textarea id="greetingMsg" rows="3" placeholder="Lời chúc tốt đẹp ...">Chúc mừng năm mới! An khang thịnh vượng!</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-image"></i> Ảnh đại diện (nên chọn ảnh nhỏ < 100KB)</label>
+                                <div class="file-input-wrapper">
+                                    <div class="custom-file-btn"><i class="fas fa-upload"></i> Chọn file ảnh</div>
+                                    <input type="file" id="imageUpload" accept="image/*">
+                                </div>
+                                <div id="file-name">Chưa chọn file</div>
+                            </div>
+                            <button class="btn-primary" id="createCardBtn"><i class="fas fa-gift"></i> Tạo thiệp & link</button>
+                            
+                            <div id="linkOutput" class="link-result hidden">
+                                <input type="text" id="generatedLink" readonly value="">
+                                <button class="btn-copy" id="copyLinkBtn"><i class="fas fa-copy"></i> Copy</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Thêm footer thông tin công ty (theo ảnh mẫu)
+                formHtml += `
+                    <div class="footer-info">
+                        <div class="row">
+                            <div class="col"><i class="fas fa-phone-alt"></i> Hotline: 0123456789</div>
+                            <div class="col"><i class="fas fa-map-marker-alt"></i> Hà Nội - TP.HCM</div>
+                            <div class="col"><i class="fas fa-envelope"></i> info@aon.com.vn</div>
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col"><i class="fas fa-users"></i> <span class="highlight">1000+</span> người dùng</div>
+                            <div class="col"><i class="fas fa-clock"></i> 24/7 hỗ trợ</div>
+                            <div class="col"><i class="fas fa-shield-alt"></i> AON global security</div>
+                        </div>
+                        <div style="text-align:center; margin-top: 8px;">⚙️ Engineer Beauty • Mát trước Mát sau ⚙️</div>
+                    </div>
+                `;
+
+                app.innerHTML = formHtml;
+
+                // Xử lý hiển thị tên file
+                const fileInput = document.getElementById('imageUpload');
+                const fileNameSpan = document.getElementById('file-name');
+                fileInput.addEventListener('change', function(e) {
+                    if (this.files && this.files[0]) {
+                        fileNameSpan.textContent = this.files[0].name + ' (' + (this.files[0].size / 1024).toFixed(1) + ' KB)';
+                    } else {
+                        fileNameSpan.textContent = 'Chưa chọn file';
+                    }
+                });
+
+                // Xử lý nút tạo thiệp
+                document.getElementById('createCardBtn').addEventListener('click', function() {
+                    const name = document.getElementById('senderName').value.trim() || 'Anh Việt Nam';
+                    const msg = document.getElementById('greetingMsg').value.trim() || 'Chúc mừng năm mới!';
+                    const file = fileInput.files[0];
+
+                    if (file) {
+                        // Kiểm tra dung lượng ảnh (cảnh báo nếu > 200KB)
+                        if (file.size > 200 * 1024) {
+                            alert('Ảnh lớn hơn 200KB, link có thể rất dài. Vẫn tiếp tục?', 'warning');
+                        }
+                        const reader = new FileReader();
+                        reader.onload = function(ev) {
+                            const base64 = ev.target.result; // data:image/png;base64,....
+                            buildLinkAndShow(name, msg, base64);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        // Không có ảnh, dùng ảnh mặc định (icon người)
+                        const defaultAvatar = 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23ffaa33\' stroke=\'%23b34700\' stroke-width=\'5\'/%3E%3Ccircle cx=\'35\' cy=\'35\' r=\'8\' fill=\'%23333333\'/%3E%3Ccircle cx=\'65\' cy=\'35\' r=\'8\' fill=\'%23333333\'/%3E%3Cpath d=\'M30 65 Q50 80 70 65\' stroke=\'%23663300\' stroke-width=\'6\' fill=\'none\' stroke-linecap=\'round\' /%3E%3C/svg%3E';
+                        buildLinkAndShow(name, msg, defaultAvatar);
+                    }
+                });
+
+                // Hàm tạo link và hiển thị
+                function buildLinkAndShow(name, msg, imgBase64) {
+                    const card = {
+                        name: name,
+                        message: msg,
+                        image: imgBase64
+                    };
+                    const jsonStr = JSON.stringify(card);
+                    const compressed = LZString.compressToEncodedURIComponent(jsonStr);
+                    const link = window.location.origin + window.location.pathname + '?data=' + compressed;
+
+                    const linkOutput = document.getElementById('linkOutput');
+                    const generatedLink = document.getElementById('generatedLink');
+                    generatedLink.value = link;
+                    linkOutput.classList.remove('hidden');
+
+                    // Cuộn tới link
+                    linkOutput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+
+                // Copy link
+                document.getElementById('copyLinkBtn').addEventListener('click', function() {
+                    const linkInput = document.getElementById('generatedLink');
+                    linkInput.select();
+                    navigator.clipboard.writeText(linkInput.value).then(() => {
+                        alert('Đã copy link! Gửi cho bạn bè nhé.');
+                    }).catch(() => {
+                        alert('Copy thủ công nha: ' + linkInput.value);
+                    });
+                });
             }
-          
+
+            // ---------- Hàm hiển thị thiệp từ dữ liệu (đã giải nén) ----------
+            function renderCardFromData(data) {
+                // data là object {name, message, image}
+                const name = data.name || 'Người gửi';
+                const msg = data.message || 'Lời chúc tốt đẹp';
+                const imgSrc = data.image || '';
+
+                let cardHtml = `
+                    <div class="header">
+                        <h1>🧧 MỞ PHONG BÌ XE 🧧</h1>
+                        <p>Nhấn vào xe để nhận lộc</p>
+                    </div>
+                    <div class="main-content">
+                        <div class="card-envelope" id="envelopeCard">
+                            <div id="vehiclePart" class="vehicle-area">
+                                <div class="vehicle-icon">
+                                    <i class="fas fa-truck-pickup"></i>
+                                </div>
+                                <p><i class="fas fa-hand-pointer"></i> Nhấn vào xe mở thiệp</p>
+                            </div>
+                            <div id="paperPart" class="message-paper hidden">
+                                <img src="${imgSrc}" alt="avatar" class="avatar" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'%3E%3Ccircle cx=\'50\' cy=\'50\' r=\'45\' fill=\'%23ccc\'/%3E%3Ctext x=\'50\' y=\'70\' font-size=\'50\' text-anchor=\'middle\' fill=\'%23666\'%3E👤%3C/text%3E%3C/svg%3E'">
+                                <div class="paper-content">
+                                    <h2>✉️ THƯ NGỎ ✉️</h2>
+                                    <div class="name-tag">${name}</div>
+                                    <div class="greeting"><i class="fas fa-quote-left"></i> ${msg} <i class="fas fa-quote-right"></i></div>
+                                    <p style="font-size:1.5rem">🧧🧧🧧</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="back-link">
+                        <a href="${window.location.origin + window.location.pathname}"><i class="fas fa-arrow-left"></i> Tạo thiệp của bạn</a>
+                    </div>
+                `;
+
+                // Thêm footer giống form
+                cardHtml += `
+                    <div class="footer-info">
+                        <div class="row">
+                            <div class="col"><i class="fas fa-phone-alt"></i> 0123456789</div>
+                            <div class="col"><i class="fas fa-map-marker-alt"></i> Hà Nội - TP.HCM</div>
+                            <div class="col"><i class="fas fa-envelope"></i> info@aon.com.vn</div>
+                        </div>
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col"><i class="fas fa-users"></i> <span class="highlight">1000+</span> người dùng</div>
+                            <div class="col"><i class="fas fa-clock"></i> 24/7</div>
+                            <div class="col"><i class="fas fa-shield-alt"></i> AON global</div>
+                        </div>
+                        <div style="text-align:center; margin-top: 8px;">⚙️ Engineer Beauty • Mát trước Mát sau ⚙️</div>
+                    </div>
+                `;
+
+                app.innerHTML = cardHtml;
+
+                // Gắn sự kiện click vào xe để mở thiệp
+                const vehicle = document.getElementById('vehiclePart');
+                const paper = document.getElementById('paperPart');
+                const envelope = document.getElementById('envelopeCard');
+
+                vehicle.addEventListener('click', function() {
+                    envelope.classList.add('open');
+                    vehicle.style.display = 'none'; // ẩn xe
+                    paper.classList.remove('hidden');
+                });
+            }
+
+            // ---------- Xử lý routing ----------
+            if (dataParam) {
+                try {
+                    const decompressed = LZString.decompressFromEncodedURIComponent(dataParam);
+                    if (decompressed) {
+                        cardData = JSON.parse(decompressed);
+                        renderCardFromData(cardData);
+                    } else {
+                        // dữ liệu rỗng -> về form
+                        renderCreateForm();
+                    }
+                } catch (e) {
+                    console.error('Lỗi giải mã:', e);
+                    renderCreateForm();
+                }
+            } else {
+                renderCreateForm();
+            }
+        })();
+    </script>
+</body>
+</html>
