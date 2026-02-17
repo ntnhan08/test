@@ -833,17 +833,41 @@
             }
         });
 
-        // Xử lý paste cho mobile - đảm bảo dán được code dài
+        // --- HANDLER PASTE SIÊU KHỦNG (hỗ trợ code hàng triệu dòng) ---
         function setupPasteHandler(editor) {
             editor.on('paste', (cm, event) => {
                 event.preventDefault();
-                let text = event.clipboardData.getData('text/plain');
-                if (text) {
-                    let cursor = editor.getCursor();
-                    editor.replaceRange(text, cursor);
+
+                // Ưu tiên sử dụng Clipboard API hiện đại (đọc bất đồng bộ, không blocking)
+                if (navigator.clipboard && navigator.clipboard.readText) {
+                    navigator.clipboard.readText()
+                        .then(text => {
+                            if (text) {
+                                const cursor = editor.getCursor();
+                                editor.replaceRange(text, cursor);
+                            }
+                        })
+                        .catch(err => {
+                            console.warn('Clipboard API failed, fallback to event.clipboardData', err);
+                            // Fallback: lấy dữ liệu từ sự kiện (vẫn có thể bị giới hạn nhưng ít nhất vẫn hoạt động)
+                            const text = event.clipboardData.getData('text/plain');
+                            if (text) {
+                                const cursor = editor.getCursor();
+                                editor.replaceRange(text, cursor);
+                            }
+                        });
+                } else {
+                    // Trình duyệt cũ: dùng clipboardData ngay lập tức
+                    const text = event.clipboardData.getData('text/plain');
+                    if (text) {
+                        const cursor = editor.getCursor();
+                        editor.replaceRange(text, cursor);
+                    }
                 }
             });
         }
+
+        // Áp dụng handler cho cả 3 editor
         setupPasteHandler(htmlEditor);
         setupPasteHandler(cssEditor);
         setupPasteHandler(jsEditor);
