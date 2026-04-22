@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>🍳 BẾP TRƯỞNG · CHÍNH THỨC</title>
+    <title>🍳 BẾP TRƯỞNG · ĐƠN GIẢN & MƯỢT</title>
     <style>
         * {
             margin: 0;
@@ -13,15 +13,23 @@
             -webkit-tap-highlight-color: transparent;
         }
         body {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
             background: #1a2e3c;
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             touch-action: none;
-            position: fixed;
-            top: 0;
-            left: 0;
+        }
+        .game-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 1 / 1;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 3px solid #ff9800;
         }
         canvas {
             display: block;
@@ -29,717 +37,487 @@
             height: 100%;
             background: radial-gradient(circle at 30% 30%, #3a6d8c, #1a2e3c);
             touch-action: none;
-            cursor: pointer;
         }
-        #ui-layer {
+        #ui {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
             pointer-events: none;
-            z-index: 20;
+            z-index: 10;
         }
-        .hud {
+        .top-bar {
             display: flex;
             justify-content: space-between;
-            padding: 16px;
+            padding: 12px;
         }
-        .hud-badge {
-            background: rgba(20, 25, 35, 0.8);
-            backdrop-filter: blur(6px);
+        .badge {
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
             color: #ffdba4;
-            padding: 8px 18px;
-            border-radius: 40px;
+            padding: 6px 16px;
+            border-radius: 30px;
             font-weight: bold;
-            font-size: 18px;
+            font-size: 16px;
             border: 1px solid #ffb74d;
         }
-        #inventory-panel {
+        #inventory {
             position: absolute;
-            bottom: 100px;
+            bottom: 20px;
             left: 20px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(6px);
-            color: #fff;
-            padding: 12px 24px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            color: white;
+            padding: 10px 20px;
             border-radius: 40px;
-            display: flex;
-            gap: 12px;
             font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
-        #interact-hint {
+        #hint {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            color: #ffb86b;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 14px;
+            border: 1px solid #ff9800;
+        }
+        #message {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0,0,0,0.7);
             color: #ffb347;
-            padding: 12px 28px;
-            border-radius: 50px;
-            font-weight: bold;
-            font-size: 22px;
-            border: 1px solid #ff9800;
-            display: none;
-            z-index: 30;
-            white-space: nowrap;
-        }
-        #tap-marker {
-            position: absolute;
-            width: 36px;
-            height: 36px;
-            border: 4px solid #ffaa00;
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            pointer-events: none;
-            z-index: 30;
-            opacity: 0.8;
-            box-shadow: 0 0 20px #ff9900;
-            display: none;
-        }
-        #confetti-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 50;
-        }
-        .btn-shop {
-            position: absolute;
-            top: 100px;
-            right: 20px;
-            background: #ff9800;
-            padding: 12px 20px;
+            padding: 12px 24px;
             border-radius: 40px;
             font-weight: bold;
-            pointer-events: auto;
-            z-index: 35;
-            border: none;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-        }
-        .btn-shop:active {
-            transform: scale(0.95);
-        }
-        ::-webkit-scrollbar {
+            font-size: 20px;
             display: none;
+            white-space: nowrap;
+            border: 1px solid #ff9800;
         }
     </style>
 </head>
 <body>
-    <canvas id="gameCanvas"></canvas>
-    <div id="ui-layer">
-        <div class="hud">
-            <div class="hud-badge">💰 <span id="moneyDisplay">250</span></div>
-            <div class="hud-badge">⭐ <span id="repDisplay">100</span></div>
-            <div class="hud-badge">📆 Ngày <span id="dayDisplay">1</span></div>
+<div class="game-wrapper">
+    <canvas id="canvas" width="600" height="600"></canvas>
+    <div id="ui">
+        <div class="top-bar">
+            <div class="badge">💰 <span id="money">250</span></div>
+            <div class="badge">⭐ <span id="rep">100</span></div>
         </div>
-        <div id="inventory-panel"><span>🎒</span><span id="inventoryText">🫗 Trống</span></div>
-        <div id="interact-hint"></div>
-        <button class="btn-shop" id="shopButton">🛒 CỬA HÀNG (Tốc độ Lv.1)</button>
+        <div id="inventory">🎒 <span id="invText">Trống</span></div>
+        <div id="hint">👆 Chạm để di chuyển / tương tác</div>
+        <div id="message"></div>
     </div>
-    <div id="tap-marker"></div>
-    <canvas id="confetti-canvas"></canvas>
+</div>
 
-    <script>
-        (function(){
-            "use strict";
+<script>
+    (function(){
+        "use strict";
 
-            // ---------- THIẾT LẬP CANVAS (ĐẢM BẢO KHÔNG LỖI HIỂN THỊ) ----------
-            const canvas = document.getElementById('gameCanvas');
-            const ctx = canvas.getContext('2d');
-            const marker = document.getElementById('tap-marker');
-            const moneySpan = document.getElementById('moneyDisplay');
-            const repSpan = document.getElementById('repDisplay');
-            const daySpan = document.getElementById('dayDisplay');
-            const inventoryText = document.getElementById('inventoryText');
-            const interactHint = document.getElementById('interact-hint');
-            const confettiCanvas = document.getElementById('confetti-canvas');
-            const confettiCtx = confettiCanvas.getContext('2d');
-            const shopBtn = document.getElementById('shopButton');
+        // --- CANVAS ---
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const moneySpan = document.getElementById('money');
+        const repSpan = document.getElementById('rep');
+        const invSpan = document.getElementById('invText');
+        const msgDiv = document.getElementById('message');
 
-            // Kích thước thế giới ảo cố định
-            const WORLD_W = 1200, WORLD_H = 1200;
+        // Kích thước cố định 600x600 cho đơn giản
+        const W = 600, H = 600;
+        canvas.width = W; canvas.height = H;
 
-            let canvasWidth = window.innerWidth;
-            let canvasHeight = window.innerHeight;
+        // --- DỮ LIỆU GAME ---
+        let money = 250;
+        let reputation = 100;
 
-            // Thiết lập kích thước canvas ngay lập tức
-            canvas.width = canvasWidth;
-            canvas.height = canvasHeight;
-            confettiCanvas.width = canvasWidth;
-            confettiCanvas.height = canvasHeight;
+        const chef = {
+            x: 300, y: 300, r: 18,
+            inventory: null
+        };
 
-            // ---------- DỮ LIỆU GAME ----------
-            let money = 250;
-            let reputation = 100;
-            let day = 1;
+        // Các trạm (hitbox hình chữ nhật)
+        const fridge = { x: 50, y: 50, w: 70, h: 70 };
+        const board = { x: 200, y: 100, w: 90, h: 60, active: false, progress: 0, max: 120 };
+        const stove = { x: 150, y: 400, w: 120, h: 80, active: false, progress: 0, max: 180, ready: false };
+        const trash = { x: 480, y: 480, w: 60, h: 60 };
+        const table = { x: 400, y: 200, w: 100, h: 70 };
 
-            // Đầu bếp
-            const chef = {
-                x: 600, y: 600,
-                radius: 24,
-                speed: 4.5,
-                angle: 0,
-                inventory: null
-            };
+        // Khách
+        let customer = null;
+        const MAX_PATIENCE = 200;
 
-            // Nâng cấp
-            const upgrades = {
-                speedLevel: 1
-            };
+        // Di chuyển
+        let target = null;
+        const SPEED = 3;
 
-            // Workstations
-            const fridge = { x: 100, y: 100, w: 90, h: 90 };
-            const cuttingBoard = { x: 300, y: 200, w: 110, h: 70, active: false, progress: 0, max: 4.0 };
-            const stove = { x: 350, y: 800, w: 200, h: 110, active: false, progress: 0, max: 6.0, ready: false, item: null };
-            const trash = { x: 1050, y: 850, w: 70, h: 70 };
-            const tables = [
-                { id: 0, x: 650, y: 300, w: 130, h: 90, chairs: [{x:580,y:320},{x:750,y:320}], customer: null },
-                { id: 1, x: 850, y: 500, w: 130, h: 90, chairs: [{x:780,y:520},{x:950,y:520}], customer: null }
-            ];
+        // Tin nhắn tạm
+        let messageTimer = 0;
 
-            let customers = [];
-            let nextCustomerId = 0;
-            const MAX_CUSTOMERS = 4;
+        // --- TIỆN ÍCH ---
+        function showMessage(text, isGood = true) {
+            msgDiv.style.display = 'block';
+            msgDiv.textContent = text;
+            msgDiv.style.color = isGood ? '#ffb347' : '#ff6b6b';
+            messageTimer = 60;
+        }
 
-            // Di chuyển
-            let targetX = null, targetY = null;
-            let moveToTarget = false;
-
-            // Confetti
-            let confettiParticles = [];
-
-            // Thời gian thực
-            let lastTimestamp = 0;
-            let deltaTime = 0;
-
-            // ---------- TIỆN ÍCH ----------
-            function vibrate(ms) {
-                if (navigator.vibrate) navigator.vibrate(ms);
+        function updateUI() {
+            moneySpan.textContent = money;
+            repSpan.textContent = reputation;
+            if (chef.inventory) {
+                invSpan.textContent = chef.inventory.icon + ' ' + (chef.inventory.name || '');
+            } else {
+                invSpan.textContent = 'Trống';
             }
+        }
 
-            function showHint(msg, isGood = true) {
-                interactHint.style.display = 'block';
-                interactHint.textContent = msg;
-                interactHint.style.color = isGood ? '#ffb347' : '#ff6b6b';
-                setTimeout(() => { interactHint.style.display = 'none'; }, 1200);
-            }
+        // Kiểm tra va chạm hình tròn với hình chữ nhật
+        function collides(cx, cy, r, rect) {
+            const nearestX = Math.max(rect.x, Math.min(cx, rect.x + rect.w));
+            const nearestY = Math.max(rect.y, Math.min(cy, rect.y + rect.h));
+            const dx = cx - nearestX;
+            const dy = cy - nearestY;
+            return (dx*dx + dy*dy) < r*r;
+        }
 
-            function updateUI() {
-                moneySpan.textContent = money;
-                repSpan.textContent = reputation;
-                daySpan.textContent = day;
-                if (chef.inventory) {
-                    inventoryText.textContent = `${chef.inventory.icon} ${chef.inventory.name || ''}`;
-                } else {
-                    inventoryText.textContent = '🫗 Trống';
-                }
-                shopBtn.textContent = `🛒 CỬA HÀNG (Tốc độ Lv.${upgrades.speedLevel})`;
-            }
+        function isChefNear(rect, extra = 0) {
+            return collides(chef.x, chef.y, chef.r + extra, rect);
+        }
 
-            function startConfetti() {
-                for (let i = 0; i < 30; i++) {
-                    confettiParticles.push({
-                        x: canvasWidth / 2,
-                        y: canvasHeight / 2,
-                        vx: (Math.random() - 0.5) * 12,
-                        vy: (Math.random() - 0.8) * 10 - 2,
-                        size: Math.random() * 8 + 4,
-                        color: `hsl(${Math.random() * 60 + 20}, 80%, 60%)`,
-                        life: 1.0
-                    });
-                }
-            }
-
-            function updateConfetti() {
-                confettiCtx.clearRect(0, 0, canvasWidth, canvasHeight);
-                confettiParticles = confettiParticles.filter(p => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.vy += 0.2;
-                    p.life -= 0.01;
-                    if (p.life <= 0) return false;
-                    confettiCtx.globalAlpha = p.life;
-                    confettiCtx.fillStyle = p.color;
-                    confettiCtx.fillRect(p.x, p.y, p.size, p.size);
+        // Tương tác khi chạm vào màn hình (gọi từ sự kiện)
+        function tryInteract() {
+            // Tủ lạnh
+            if (isChefNear(fridge, 10)) {
+                if (!chef.inventory) {
+                    chef.inventory = { type: 'ingredient', icon: '🍅', name: 'Cà chua' };
+                    showMessage('Đã lấy 🍅');
+                    updateUI();
                     return true;
-                });
-                confettiCtx.globalAlpha = 1.0;
-                requestAnimationFrame(updateConfetti);
-            }
-            updateConfetti();
-
-            // ---------- VA CHẠM CHÍNH XÁC (AABB) ----------
-            function circleRectCollision(cx, cy, r, rect) {
-                const closestX = Math.max(rect.x, Math.min(cx, rect.x + rect.w));
-                const closestY = Math.max(rect.y, Math.min(cy, rect.y + rect.h));
-                const dx = cx - closestX;
-                const dy = cy - closestY;
-                return (dx * dx + dy * dy) < r * r;
-            }
-
-            function isChefNear(rect, extraRadius = 0) {
-                return circleRectCollision(chef.x, chef.y, chef.radius + extraRadius, rect);
-            }
-
-            // ---------- CHUYỂN ĐỔI TỌA ĐỘ (ĐẢM BẢO ĐÚNG TRÊN MỌI THIẾT BỊ) ----------
-            function getTransform() {
-                const scale = Math.min(canvasWidth / WORLD_W, canvasHeight / WORLD_H);
-                const offsetX = (canvasWidth - WORLD_W * scale) / 2;
-                const offsetY = (canvasHeight - WORLD_H * scale) / 2;
-                return { scale, offsetX, offsetY };
-            }
-
-            function screenToWorld(clientX, clientY) {
-                const rect = canvas.getBoundingClientRect();
-                const { scale, offsetX, offsetY } = getTransform();
-                const wx = (clientX - rect.left - offsetX) / scale;
-                const wy = (clientY - rect.top - offsetY) / scale;
-                return {
-                    x: Math.min(WORLD_W - 40, Math.max(40, wx)),
-                    y: Math.min(WORLD_H - 40, Math.max(40, wy))
-                };
-            }
-
-            function worldToScreen(worldX, worldY) {
-                const rect = canvas.getBoundingClientRect();
-                const { scale, offsetX, offsetY } = getTransform();
-                return {
-                    x: rect.left + offsetX + worldX * scale,
-                    y: rect.top + offsetY + worldY * scale
-                };
-            }
-
-            // ---------- VẼ ĐỐI TƯỢNG (ĐẦY ĐỦ) ----------
-            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-                if (w < 2 * r) r = w / 2;
-                if (h < 2 * r) r = h / 2;
-                this.moveTo(x + r, y);
-                this.lineTo(x + w - r, y);
-                this.quadraticCurveTo(x + w, y, x + w, y + r);
-                this.lineTo(x + w, y + h - r);
-                this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-                this.lineTo(x + r, y + h);
-                this.quadraticCurveTo(x, y + h, x, y + h - r);
-                this.lineTo(x, y + r);
-                this.quadraticCurveTo(x, y, x + r, y);
-                return this;
-            };
-
-            function drawProgressCircle(x, y, progress, max, color = '#4caf50') {
-                ctx.beginPath();
-                ctx.arc(x, y - 20, 18, 0, 2 * Math.PI);
-                ctx.strokeStyle = '#333';
-                ctx.lineWidth = 6;
-                ctx.stroke();
-                ctx.beginPath();
-                ctx.arc(x, y - 20, 18, -Math.PI/2, -Math.PI/2 + (progress / max) * 2 * Math.PI);
-                ctx.strokeStyle = color;
-                ctx.lineWidth = 6;
-                ctx.stroke();
-            }
-
-            function drawScene() {
-                ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-                const { scale, offsetX, offsetY } = getTransform();
-                ctx.save();
-                ctx.translate(offsetX, offsetY);
-                ctx.scale(scale, scale);
-
-                // Nền lưới
-                ctx.strokeStyle = '#6b9ab0';
-                ctx.lineWidth = 2;
-                ctx.globalAlpha = 0.25;
-                for (let i = 0; i < WORLD_W; i += 60) {
-                    ctx.beginPath();
-                    ctx.moveTo(i, 0);
-                    ctx.lineTo(i, WORLD_H);
-                    ctx.stroke();
+                } else {
+                    showMessage('Tay đang cầm đồ!', false);
+                    return true;
                 }
-                for (let i = 0; i < WORLD_H; i += 60) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, i);
-                    ctx.lineTo(WORLD_W, i);
-                    ctx.stroke();
+            }
+
+            // Thớt
+            if (isChefNear(board, 10)) {
+                if (chef.inventory && chef.inventory.type === 'ingredient' && !board.active) {
+                    board.active = true;
+                    board.progress = 0;
+                    chef.inventory = null;
+                    showMessage('Đang thái...');
+                    updateUI();
+                    return true;
+                } else if (board.active) {
+                    showMessage('Thớt đang bận', false);
+                    return true;
+                } else {
+                    showMessage('Cần nguyên liệu', false);
+                    return true;
                 }
-                ctx.globalAlpha = 1.0;
+            }
 
-                // Tủ lạnh
-                ctx.fillStyle = '#7cb9e8';
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = '#00000060';
-                ctx.beginPath();
-                ctx.roundRect(fridge.x, fridge.y, fridge.w, fridge.h, 12);
-                ctx.fill();
-                ctx.fillStyle = '#fff';
-                ctx.font = 'bold 30px "Segoe UI"';
-                ctx.fillText('🧊', fridge.x + 25, fridge.y + 55);
-
-                // Thớt
-                ctx.fillStyle = '#b89b7b';
-                ctx.beginPath();
-                ctx.roundRect(cuttingBoard.x, cuttingBoard.y, cuttingBoard.w, cuttingBoard.h, 10);
-                ctx.fill();
-                if (cuttingBoard.active) {
-                    drawProgressCircle(cuttingBoard.x + 55, cuttingBoard.y + 35, cuttingBoard.progress, cuttingBoard.max, '#ff9800');
+            // Bếp
+            if (isChefNear(stove, 15)) {
+                if (stove.ready && !chef.inventory) {
+                    chef.inventory = { type: 'dish', icon: '🍕', name: 'Pizza' };
+                    stove.ready = false;
+                    showMessage('Đã lấy Pizza!');
+                    updateUI();
+                    return true;
                 }
-
-                // Bếp
-                ctx.fillStyle = '#5a6b7a';
-                ctx.beginPath();
-                ctx.roundRect(stove.x, stove.y, stove.w, stove.h, 16);
-                ctx.fill();
-                ctx.fillStyle = '#444';
-                ctx.beginPath();
-                ctx.ellipse(stove.x + 100, stove.y + 55, 35, 25, 0, 0, Math.PI * 2);
-                ctx.fill();
+                if (board.active && board.progress >= board.max && !stove.active && !stove.ready) {
+                    stove.active = true;
+                    stove.progress = 0;
+                    board.active = false;
+                    showMessage('Bắt đầu nấu 🍕');
+                    return true;
+                }
                 if (stove.active) {
-                    drawProgressCircle(stove.x + 100, stove.y + 55, stove.progress, stove.max, '#f44336');
-                    ctx.fillStyle = '#ff8c00';
-                    ctx.shadowColor = '#ff6600';
-                    ctx.shadowBlur = 20;
-                    ctx.beginPath();
-                    ctx.ellipse(stove.x + 100, stove.y + 40, 20, 12, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if (stove.ready) {
-                    ctx.fillStyle = '#4caf50';
-                    ctx.shadowColor = '#2e7d32';
-                    ctx.shadowBlur = 20;
-                    ctx.beginPath();
-                    ctx.ellipse(stove.x + 100, stove.y + 40, 25, 15, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#fff';
-                    ctx.font = 'bold 24px "Segoe UI"';
-                    ctx.fillText('✅', stove.x + 80, stove.y + 30);
-                } else {
-                    ctx.fillStyle = '#ff8c00';
-                    ctx.shadowBlur = 15;
-                    ctx.beginPath();
-                    ctx.ellipse(stove.x + 100, stove.y + 40, 18, 10, 0, 0, Math.PI * 2);
-                    ctx.fill();
+                    showMessage('Bếp đang nấu', false);
+                    return true;
                 }
+                if (stove.ready && chef.inventory) {
+                    showMessage('Tay đang cầm đồ!', false);
+                    return true;
+                }
+                showMessage('Chưa có gì để nấu', false);
+                return true;
+            }
 
-                // Thùng rác
-                ctx.fillStyle = '#6d4c41';
-                ctx.shadowBlur = 8;
-                ctx.beginPath();
-                ctx.roundRect(trash.x, trash.y, trash.w, trash.h, 10);
-                ctx.fill();
-                ctx.fillStyle = '#fff';
-                ctx.font = '30px "Segoe UI"';
-                ctx.fillText('🗑️', trash.x + 20, trash.y + 45);
-                ctx.shadowBlur = 0;
-                ctx.shadowColor = 'transparent';
-
-                // Bàn ghế
-                tables.forEach(t => {
-                    ctx.fillStyle = '#8b5e3c';
-                    ctx.shadowBlur = 10;
-                    ctx.beginPath();
-                    ctx.roundRect(t.x, t.y, t.w, t.h, 14);
-                    ctx.fill();
-                    t.chairs.forEach(ch => {
-                        ctx.fillStyle = '#a57c5c';
-                        ctx.beginPath();
-                        ctx.ellipse(ch.x, ch.y, 18, 14, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                    });
-                });
-
-                // Khách hàng
-                customers.forEach(c => {
-                    ctx.fillStyle = c.color || '#6a8d73';
-                    ctx.shadowBlur = 10;
-                    ctx.beginPath();
-                    ctx.ellipse(c.x, c.y - 2, 22, 18, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.fillStyle = '#f5dbb1';
-                    ctx.beginPath();
-                    ctx.arc(c.x, c.y - 28, 18, 0, Math.PI * 2);
-                    ctx.fill();
-                    if (c.state === 'waiting') {
-                        let patience = c.patience / c.maxPatience;
-                        let hue = Math.max(0, patience * 120);
-                        ctx.fillStyle = '#fff8e7';
-                        ctx.shadowBlur = 8;
-                        ctx.beginPath();
-                        ctx.ellipse(c.x - 25, c.y - 65, 32, 22, 0, 0, Math.PI * 2);
-                        ctx.fill();
-                        ctx.fillStyle = `hsl(${hue}, 80%, 60%)`;
-                        ctx.font = 'bold 28px "Segoe UI"';
-                        ctx.fillText(c.orderIcon, c.x - 42, c.y - 58);
-                    }
-                });
-
-                // Đầu bếp
-                ctx.shadowBlur = 12;
-                ctx.fillStyle = '#f8f8f8';
-                ctx.beginPath();
-                ctx.ellipse(chef.x, chef.y - 6, 22, 18, 0, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#f5dbb1';
-                ctx.beginPath();
-                ctx.arc(chef.x, chef.y - 32, 18, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.fillStyle = '#fff';
-                ctx.beginPath();
-                ctx.arc(chef.x, chef.y - 52, 14, 0, Math.PI * 2);
-                ctx.fill();
+            // Thùng rác
+            if (isChefNear(trash, 10)) {
                 if (chef.inventory) {
-                    ctx.font = '28px "Segoe UI"';
-                    ctx.fillStyle = '#000';
-                    ctx.fillText(chef.inventory.icon, chef.x + 20, chef.y - 30);
-                }
-                ctx.shadowBlur = 0;
-
-                ctx.restore();
-            }
-
-            // ---------- XỬ LÝ TƯƠNG TÁC ----------
-            function tryInteract() {
-                // Tủ lạnh
-                if (isChefNear(fridge, 20)) {
-                    if (!chef.inventory) {
-                        chef.inventory = { type: 'ingredient', icon: '🍅', name: 'Cà chua' };
-                        showHint('Đã lấy 🍅', true);
-                        updateUI();
-                        return true;
-                    } else {
-                        showHint('Tay đang cầm đồ!', false);
-                        return true;
-                    }
-                }
-
-                // Thớt
-                if (isChefNear(cuttingBoard, 20)) {
-                    if (chef.inventory && chef.inventory.type === 'ingredient' && !cuttingBoard.active) {
-                        cuttingBoard.active = true;
-                        cuttingBoard.progress = 0;
-                        chef.inventory = null;
-                        showHint('Đang thái...', true);
-                        updateUI();
-                        return true;
-                    } else if (cuttingBoard.active) {
-                        showHint('Thớt đang bận!', false);
-                        return true;
-                    } else {
-                        showHint('Cần nguyên liệu!', false);
-                        return true;
-                    }
-                }
-
-                // Bếp
-                if (isChefNear(stove, 30)) {
-                    if (stove.ready && !chef.inventory) {
-                        chef.inventory = { type: 'dish', icon: stove.item, name: 'Pizza' };
-                        stove.ready = false;
-                        stove.item = null;
-                        showHint('Nhận Pizza!', true);
-                        updateUI();
-                        return true;
-                    }
-                    if (cuttingBoard.active && cuttingBoard.progress >= cuttingBoard.max && !stove.active && !stove.ready) {
-                        stove.active = true;
-                        stove.progress = 0;
-                        stove.item = '🍕';
-                        cuttingBoard.active = false;
-                        cuttingBoard.progress = 0;
-                        showHint('Bắt đầu nấu 🍕', true);
-                        vibrate(30);
-                        return true;
-                    }
-                    if (stove.active) {
-                        showHint('Bếp đang nấu!', false);
-                        return true;
-                    }
-                    if (stove.ready && chef.inventory) {
-                        showHint('Tay đang cầm đồ, không nhận được!', false);
-                        return true;
-                    }
-                    showHint('Chưa có gì để nấu', false);
-                    return true;
-                }
-
-                // Thùng rác
-                if (isChefNear(trash, 20)) {
-                    if (chef.inventory) {
-                        chef.inventory = null;
-                        showHint('Đã vứt đồ', true);
-                        updateUI();
-                    } else {
-                        showHint('Tay không có gì', false);
-                    }
-                    return true;
-                }
-
-                // Giao món cho khách
-                for (let c of customers) {
-                    const dist = Math.hypot(chef.x - c.x, chef.y - c.y);
-                    if (dist < 60 && chef.inventory && chef.inventory.type === 'dish') {
-                        if (c.state === 'waiting') {
-                            money += 20;
-                            reputation = Math.min(100, reputation + 5);
-                            chef.inventory = null;
-                            c.state = 'leaving';
-                            showHint('Giao món +20$', true);
-                            startConfetti();
-                            updateUI();
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-
-            function handleTap(e) {
-                e.preventDefault();
-                let clientX, clientY;
-                if (e.touches) {
-                    clientX = e.touches[0].clientX;
-                    clientY = e.touches[0].clientY;
+                    chef.inventory = null;
+                    showMessage('Đã vứt đồ');
+                    updateUI();
                 } else {
-                    clientX = e.clientX;
-                    clientY = e.clientY;
+                    showMessage('Tay trống', false);
                 }
-                const worldPos = screenToWorld(clientX, clientY);
-
-                if (tryInteract()) return;
-
-                targetX = worldPos.x;
-                targetY = worldPos.y;
-                moveToTarget = true;
-                const screenPos = worldToScreen(targetX, targetY);
-                marker.style.display = 'block';
-                marker.style.left = screenPos.x + 'px';
-                marker.style.top = screenPos.y + 'px';
+                return true;
             }
 
-            // ---------- CẬP NHẬT GAME (DELTA TIME) ----------
-            function updateMovement() {
-                if (!moveToTarget) return;
-                const dx = targetX - chef.x;
-                const dy = targetY - chef.y;
+            // Giao đồ cho khách
+            if (customer && customer.state === 'waiting') {
+                const dist = Math.hypot(chef.x - customer.x, chef.y - customer.y);
+                if (dist < 50 && chef.inventory && chef.inventory.type === 'dish') {
+                    money += 20;
+                    reputation = Math.min(100, reputation + 5);
+                    chef.inventory = null;
+                    customer.state = 'leaving';
+                    showMessage('Giao món +20$');
+                    updateUI();
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        // Xử lý chạm
+        function handleStart(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = W / rect.width;
+            const scaleY = H / rect.height;
+
+            let clientX, clientY;
+            if (e.touches) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+            } else {
+                clientX = e.clientX;
+                clientY = e.clientY;
+            }
+
+            const canvasX = (clientX - rect.left) * scaleX;
+            const canvasY = (clientY - rect.top) * scaleY;
+
+            // Thử tương tác trước
+            if (tryInteract()) return;
+
+            // Nếu không, đặt điểm đến
+            target = { x: Math.min(W-30, Math.max(30, canvasX)), y: Math.min(H-30, Math.max(30, canvasY)) };
+        }
+
+        // Cập nhật game
+        function update() {
+            // Di chuyển
+            if (target) {
+                const dx = target.x - chef.x;
+                const dy = target.y - chef.y;
                 const dist = Math.hypot(dx, dy);
                 if (dist < 5) {
-                    moveToTarget = false;
-                    marker.style.display = 'none';
-                    return;
-                }
-                const step = Math.min(dist, chef.speed * deltaTime * 60);
-                chef.x += (dx / dist) * step;
-                chef.y += (dy / dist) * step;
-                const screenPos = worldToScreen(targetX, targetY);
-                marker.style.left = screenPos.x + 'px';
-                marker.style.top = screenPos.y + 'px';
-            }
-
-            function updateGame(now) {
-                deltaTime = Math.min(0.03, (now - lastTimestamp) / 1000);
-                lastTimestamp = now;
-
-                updateMovement();
-
-                if (cuttingBoard.active) {
-                    cuttingBoard.progress += deltaTime;
-                    if (cuttingBoard.progress >= cuttingBoard.max) {
-                        cuttingBoard.active = false;
-                        showHint('Thái xong!', true);
-                    }
-                }
-
-                if (stove.active) {
-                    stove.progress += deltaTime;
-                    if (stove.progress >= stove.max) {
-                        stove.active = false;
-                        stove.ready = true;
-                        showHint('Nấu xong! Chạm bếp để lấy.', true);
-                        startConfetti();
-                        vibrate(50);
-                    }
-                }
-
-                customers = customers.filter(c => {
-                    if (c.state === 'waiting') {
-                        c.patience -= deltaTime * 5;
-                        if (c.patience <= 0) {
-                            reputation = Math.max(0, reputation - 10);
-                            showHint('Khách bỏ đi!', false);
-                            updateUI();
-                            return false;
-                        }
-                    } else if (c.state === 'leaving') {
-                        return false;
-                    }
-                    return true;
-                });
-
-                if (customers.length < MAX_CUSTOMERS && Math.random() < 0.005) {
-                    let freeTable = tables.find(t => !t.customer);
-                    if (freeTable) {
-                        let chair = freeTable.chairs[0];
-                        let c = {
-                            id: nextCustomerId++,
-                            x: chair.x, y: chair.y,
-                            color: '#5f9d80',
-                            orderIcon: '🍕',
-                            state: 'waiting',
-                            patience: 100,
-                            maxPatience: 100,
-                            table: freeTable
-                        };
-                        freeTable.customer = c;
-                        customers.push(c);
-                    }
-                }
-
-                updateUI();
-            }
-
-            // ---------- SỰ KIỆN ----------
-            canvas.addEventListener('mousedown', handleTap);
-            canvas.addEventListener('touchstart', handleTap, { passive: false });
-            canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
-            canvas.addEventListener('touchend', (e) => e.preventDefault());
-
-            window.addEventListener('resize', () => {
-                canvasWidth = window.innerWidth;
-                canvasHeight = window.innerHeight;
-                canvas.width = canvasWidth;
-                canvas.height = canvasHeight;
-                confettiCanvas.width = canvasWidth;
-                confettiCanvas.height = canvasHeight;
-                if (moveToTarget) {
-                    const screenPos = worldToScreen(targetX, targetY);
-                    marker.style.left = screenPos.x + 'px';
-                    marker.style.top = screenPos.y + 'px';
-                }
-            });
-
-            shopBtn.addEventListener('click', () => {
-                const cost = 50;
-                if (money >= cost) {
-                    money -= cost;
-                    upgrades.speedLevel++;
-                    chef.speed = 4.5 + (upgrades.speedLevel - 1) * 0.8;
-                    showHint(`Tốc độ Lv.${upgrades.speedLevel}!`, true);
-                    updateUI();
-                    vibrate(20);
+                    target = null;
                 } else {
-                    showHint('Không đủ tiền!', false);
+                    const step = Math.min(dist, SPEED);
+                    chef.x += (dx / dist) * step;
+                    chef.y += (dy / dist) * step;
                 }
-            });
+            }
 
-            function gameLoop(now) {
-                updateGame(now);
-                drawScene();
-                requestAnimationFrame(gameLoop);
+            // Tiến trình thái
+            if (board.active) {
+                board.progress += 1;
+                if (board.progress >= board.max) {
+                    board.active = false;
+                    showMessage('Thái xong!');
+                }
+            }
+
+            // Tiến trình nấu
+            if (stove.active) {
+                stove.progress += 1;
+                if (stove.progress >= stove.max) {
+                    stove.active = false;
+                    stove.ready = true;
+                    showMessage('Nấu xong! Chạm bếp để lấy');
+                }
+            }
+
+            // Khách hàng
+            if (!customer && Math.random() < 0.01) {
+                customer = {
+                    x: 450, y: 250,
+                    state: 'waiting',
+                    patience: MAX_PATIENCE,
+                    maxPatience: MAX_PATIENCE,
+                    order: '🍕'
+                };
+            }
+
+            if (customer) {
+                if (customer.state === 'waiting') {
+                    customer.patience -= 1;
+                    if (customer.patience <= 0) {
+                        reputation = Math.max(0, reputation - 10);
+                        showMessage('Khách bỏ đi! -10', false);
+                        customer = null;
+                        updateUI();
+                    }
+                } else if (customer.state === 'leaving') {
+                    customer = null;
+                }
+            }
+
+            // Tin nhắn
+            if (messageTimer > 0) {
+                messageTimer--;
+                if (messageTimer === 0) msgDiv.style.display = 'none';
             }
 
             updateUI();
-            requestAnimationFrame(gameLoop);
-        })();
-    </script>
+        }
+
+        // Vẽ
+        function draw() {
+            ctx.clearRect(0, 0, W, H);
+
+            // Lưới
+            ctx.strokeStyle = '#5f8aa0';
+            ctx.lineWidth = 1;
+            ctx.globalAlpha = 0.3;
+            for (let i=0; i<W; i+=40) {
+                ctx.beginPath();
+                ctx.moveTo(i,0); ctx.lineTo(i,H);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0,i); ctx.lineTo(W,i);
+                ctx.stroke();
+            }
+            ctx.globalAlpha = 1.0;
+
+            // Tủ lạnh
+            ctx.fillStyle = '#7cb9e8';
+            ctx.fillRect(fridge.x, fridge.y, fridge.w, fridge.h);
+            ctx.fillStyle = '#fff';
+            ctx.font = '30px "Segoe UI"';
+            ctx.fillText('🧊', fridge.x+20, fridge.y+45);
+
+            // Thớt
+            ctx.fillStyle = '#b89b7b';
+            ctx.fillRect(board.x, board.y, board.w, board.h);
+            if (board.active) {
+                ctx.fillStyle = '#ff9800';
+                ctx.fillRect(board.x+5, board.y+5, (board.progress/board.max)*(board.w-10), 8);
+            }
+
+            // Bếp
+            ctx.fillStyle = '#5a6b7a';
+            ctx.fillRect(stove.x, stove.y, stove.w, stove.h);
+            ctx.fillStyle = '#444';
+            ctx.beginPath();
+            ctx.ellipse(stove.x+60, stove.y+40, 30, 20, 0, 0, Math.PI*2);
+            ctx.fill();
+            if (stove.active) {
+                ctx.fillStyle = '#f44336';
+                ctx.fillRect(stove.x+10, stove.y+5, (stove.progress/stove.max)*(stove.w-20), 8);
+                ctx.fillStyle = '#ff8c00';
+                ctx.beginPath();
+                ctx.ellipse(stove.x+60, stove.y+30, 15, 10, 0, 0, Math.PI*2);
+                ctx.fill();
+            } else if (stove.ready) {
+                ctx.fillStyle = '#4caf50';
+                ctx.beginPath();
+                ctx.ellipse(stove.x+60, stove.y+30, 20, 15, 0, 0, Math.PI*2);
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 20px "Segoe UI"';
+                ctx.fillText('✅', stove.x+50, stove.y+25);
+            } else {
+                ctx.fillStyle = '#ff8c00';
+                ctx.beginPath();
+                ctx.ellipse(stove.x+60, stove.y+30, 12, 8, 0, 0, Math.PI*2);
+                ctx.fill();
+            }
+
+            // Thùng rác
+            ctx.fillStyle = '#6d4c41';
+            ctx.fillRect(trash.x, trash.y, trash.w, trash.h);
+            ctx.fillStyle = '#fff';
+            ctx.font = '24px "Segoe UI"';
+            ctx.fillText('🗑️', trash.x+18, trash.y+40);
+
+            // Bàn
+            ctx.fillStyle = '#8b5e3c';
+            ctx.fillRect(table.x, table.y, table.w, table.h);
+
+            // Khách
+            if (customer) {
+                ctx.fillStyle = '#6a8d73';
+                ctx.beginPath();
+                ctx.arc(customer.x, customer.y, 18, 0, 2*Math.PI);
+                ctx.fill();
+                ctx.fillStyle = '#f5dbb1';
+                ctx.beginPath();
+                ctx.arc(customer.x, customer.y-20, 14, 0, 2*Math.PI);
+                ctx.fill();
+                if (customer.state === 'waiting') {
+                    const patiencePercent = customer.patience / customer.maxPatience;
+                    ctx.fillStyle = '#fff8e7';
+                    ctx.beginPath();
+                    ctx.ellipse(customer.x-20, customer.y-50, 25, 18, 0, 0, Math.PI*2);
+                    ctx.fill();
+                    ctx.fillStyle = `hsl(${patiencePercent * 120}, 80%, 60%)`;
+                    ctx.font = 'bold 24px "Segoe UI"';
+                    ctx.fillText(customer.order, customer.x-35, customer.y-45);
+                }
+            }
+
+            // Đầu bếp
+            ctx.fillStyle = '#f8f8f8';
+            ctx.beginPath();
+            ctx.arc(chef.x, chef.y-4, chef.r, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = '#f5dbb1';
+            ctx.beginPath();
+            ctx.arc(chef.x, chef.y-22, 14, 0, 2*Math.PI);
+            ctx.fill();
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(chef.x, chef.y-38, 12, 0, 2*Math.PI);
+            ctx.fill();
+            if (chef.inventory) {
+                ctx.font = '24px "Segoe UI"';
+                ctx.fillStyle = '#000';
+                ctx.fillText(chef.inventory.icon, chef.x+15, chef.y-25);
+            }
+
+            // Điểm đến
+            if (target) {
+                ctx.strokeStyle = '#ffaa00';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(target.x, target.y, 12, 0, 2*Math.PI);
+                ctx.stroke();
+            }
+        }
+
+        // Game loop
+        function loop() {
+            update();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        // Sự kiện
+        canvas.addEventListener('touchstart', handleStart, { passive: false });
+        canvas.addEventListener('mousedown', handleStart);
+        canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+        canvas.addEventListener('touchend', (e) => e.preventDefault());
+
+        // Khởi động
+        updateUI();
+        loop();
+    })();
+</script>
 </body>
 </html>
